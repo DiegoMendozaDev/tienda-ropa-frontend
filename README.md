@@ -6,7 +6,7 @@ While this project uses React, Vite supports many popular JS frameworks. [See al
 
 need: 
 - npm isntall
-- npm install react-router-dom@6
+- npm install react-router-dom@6 react-bootstrap bootstrap
 ## Deploy Your Own
 
 Deploy your own Vite project with Vercel.
