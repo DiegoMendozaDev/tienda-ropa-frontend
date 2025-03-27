@@ -4,6 +4,9 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 While this project uses React, Vite supports many popular JS frameworks. [See all the supported frameworks](https://vitejs.dev/guide/#scaffolding-your-first-vite-project).
 
+need: 
+- npm isntall
+- npm install react-router-dom@6 react-bootstrap bootstrap
 ## Deploy Your Own
 
 Deploy your own Vite project with Vercel.
