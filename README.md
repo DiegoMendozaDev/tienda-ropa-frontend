@@ -6,7 +6,8 @@ While this project uses React, Vite supports many popular JS frameworks. [See al
 
 need: 
 - npm isntall
-- npm install react-router-dom@6 react-bootstrap bootstrap @material-tailwind/react yup formik @heroicons/react tailwindcss autoprefixer
+- npm install react-router-dom@6 react-bootstrap bootstrap @material-tailwind/react yup formik @heroicons/react tailwindcss autoprefixer @tailwindcss/postcss --save-dev
+
 ## Deploy Your Own
 
 Deploy your own Vite project with Vercel.
