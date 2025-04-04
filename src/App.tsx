@@ -6,7 +6,6 @@ import Chico from './pages/Chico.tsx';
 import Chica from './pages/Chica.tsx';
 import Login from './pages/Login.tsx';
 import Register from './pages/Register.tsx';
-
 function App() {
 
   return (

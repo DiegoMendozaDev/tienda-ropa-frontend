@@ -11,7 +11,6 @@ function FormLogin() {
   const { Formik } = formik;
 
   const schema = yup.object().shape({
-    name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required(),
     repeatPassword: yup.string().required(),
@@ -21,7 +20,6 @@ function FormLogin() {
     <Formik
       validationSchema={schema}
       initialValues={{
-        name: '',
         email: '',
         password: '',
         rememberMe: false,
@@ -35,24 +33,6 @@ function FormLogin() {
     >
       {({ handleSubmit, handleChange, values, errors }) => (
         <Form noValidate onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label htmlFor="inlineFormInputName">
-              Name
-            </Form.Label>
-            <Form.Control
-              required
-              type="text"
-              name="name"
-              id="inlineFormInputName"
-              value={values.name}
-              placeholder="Jane Doe"
-              onChange={handleChange}
-              isInvalid={!!errors.name}
-            />
-            <Form.Control.Feedback type="invalid" tooltip>
-              {errors.name}
-            </Form.Control.Feedback>
-          </Form.Group>
           <Form.Group>
             <Form.Label htmlFor="inlineFormInputGroupUsername">
               Email address
@@ -108,7 +88,7 @@ function FormLogin() {
           <Container>
             <Row>
               <Col><Button type="submit" className="p-2" variant="outline-primary">Login</Button></Col>
-              <Col><a href="/"><Button className="p-2" variant="outline-secondary">Back</Button></a></Col>
+              <Col><Button className="p-2" variant="outline-secondary" href="/">Back</Button></Col>
             </Row>
           </Container>
         </Form>
