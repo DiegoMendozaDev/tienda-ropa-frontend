@@ -7,7 +7,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Bag, Heart, List, Person } from 'react-bootstrap-icons';
 
-function NavScrollExample() {
+function NavScroll() {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -19,11 +19,11 @@ function NavScrollExample() {
         {/* Contenedor principal con tres secciones: izquierda, centro y derecha */}
         <div className="d-flex w-100 align-items-center">
           {/* Izquierda: botón offcanvas y primer enlace */}
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center gap-3">
             <Button variant="outline-secondary" onClick={handleShow}>
               <List size={26} className="ml-4" />
             </Button>
-            <Nav.Link href="#action2" className="ms-3">Link</Nav.Link>
+            <Nav.Link href="#action2" className="ms-3">Contact us</Nav.Link>
             <Navbar.Collapse id="navbarScroll">
           <Nav className="w-100" navbarScroll>
             <Form className="d-flex w-100 justify-content-center">
@@ -58,7 +58,7 @@ function NavScrollExample() {
             </Nav.Link>
             <div className="d-flex ms-3">
               <Button variant="outline-primary" className="me-2" href="/login">Login</Button>
-              <Button variant="outline-secondary">Register</Button>
+              <Button variant="outline-secondary" href="/register">Register</Button>
             </div>
           </div>
         </div>
@@ -79,4 +79,4 @@ function NavScrollExample() {
   );
 }
 
-export default NavScrollExample;
+export default NavScroll;
