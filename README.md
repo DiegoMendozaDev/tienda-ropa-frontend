@@ -6,7 +6,7 @@ While this project uses React, Vite supports many popular JS frameworks. [See al
 
 need: 
 - npm isntall
-- npm install react-router-dom@6 react-bootstrap bootstrap yup formik @heroicons/react autoprefixer iconoir-react mdb-react-ui-kit react-bootstrap-icons --save-dev
+- npm install react-router-dom@6 react-bootstrap bootstrap yup formik @heroicons/react autoprefixer iconoir-react mdb-react-ui-kit react-bootstrap-icons cors --save-dev
 
 ## Deploy Your Own
 
