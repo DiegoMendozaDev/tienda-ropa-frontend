@@ -6,15 +6,24 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Bag, Heart, List, Person } from 'react-bootstrap-icons';
+import { useCookies } from 'react-cookie';
 
 function NavScroll() {
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [show, setShow] = useState(false);
 
+  const isLoggedIn = Boolean(cookies.user);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // Función para cerrar sesión: elimina la cookie y puede redirigir o actualizar
+  const logout = () => {
+    removeCookie('user', { path: '/' });
+    // Opcional: redirigir o refrescar la página
+    window.location.reload();
+  };
   return (
-    <Navbar fixed="top" expand="sm" className="bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
+    <Navbar fixed="top" expand="sm" className="ms-auto d-flex bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
       <Container fluid>
         {/* Contenedor principal con tres secciones: izquierda, centro y derecha */}
         <div className="d-flex w-100 align-items-center">
@@ -23,21 +32,20 @@ function NavScroll() {
             <Button variant="outline-secondary" onClick={handleShow}>
               <List size={26} className="ml-4" />
             </Button>
-            <Nav.Link href="#action2" className="ms-3">Contact us</Nav.Link>
-            <Navbar.Collapse id="navbarScroll">
-          <Nav className="w-100" navbarScroll>
-            <Form className="d-flex w-100 justify-content-center">
-              <Form.Control
-                type="search"
-                placeholder="Search"
-                className="me-2"
-                aria-label="Search"
-                style={{ maxWidth: '500px' }}
-              />
-              <Button variant="outline-success">Search</Button>
-            </Form>
-          </Nav>
-        </Navbar.Collapse>
+            <div className='d-none d-sm-flex align-items-center gap-3'>
+            <Nav className="w-100" navbarScroll>
+              <Form className="d-flex w-100 justify-content-center">
+                <Form.Control
+                  type="search"
+                  placeholder="Search"
+                  className="me-2"
+                  aria-label="Search"
+                  style={{ maxWidth: '300px' }}
+                />
+                <Button variant="outline-success">Search</Button>
+              </Form>
+            </Nav>
+            </div>
           </div>
 
           {/* Centro: marca centrada */}
@@ -50,21 +58,27 @@ function NavScroll() {
             <Nav.Link href="/profile">
               <Person size={26} />
             </Nav.Link>
-            <Nav.Link href="/favorites">
-              <Heart size={26} />
-            </Nav.Link>
             <Nav.Link href="/cart">
               <Bag size={26} />
             </Nav.Link>
-            <div className="d-flex ms-3">
-              <Button variant="outline-primary" className="me-2" href="/login">Login</Button>
-              <Button variant="outline-secondary" href="/register">Register</Button>
-            </div>
+            <Nav.Link href="/favorites">
+              <Heart size={26} />
+            </Nav.Link>
+
+            {/* Renderiza Login/Register si no está logueado, sino Logout */}
+            {isLoggedIn ? (
+              <div className="d-flex align-items-center gap-2 ms-3">
+                <Button variant="outline-danger" onClick={logout}>Logout</Button>
+              </div>
+            ) : (
+              <div className="d-flex ms-3">
+                <Button variant="outline-primary" className="me-2" href="/login">Login</Button>
+                <Button variant="outline-secondary" href="/register">Register</Button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Toggle y Collapse para el buscador */}
-        <Navbar.Toggle aria-controls="navbarScroll" className="mt-3" />
         {/* Offcanvas */}
         <Offcanvas show={show} onHide={handleClose} backdrop="static">
           <Offcanvas.Header closeButton>
@@ -72,6 +86,18 @@ function NavScroll() {
           </Offcanvas.Header>
           <Offcanvas.Body>
             I will not close if you click outside of me.
+            <div className='d-block d-sm-none'>
+            <Form className="d-flex mb-3">
+              <Form.Control
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                className="me-2"
+              />
+              <Button variant="outline-success">Search</Button>
+            </Form>
+            </div>
+
           </Offcanvas.Body>
         </Offcanvas>
       </Container>

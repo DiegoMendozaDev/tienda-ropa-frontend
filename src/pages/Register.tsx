@@ -1,145 +1,226 @@
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
-import * as formik from 'formik';
+import { useState } from 'react';
+import { Formik, Form as FormikForm, FormikHelpers } from 'formik';
 import * as yup from 'yup';
+import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { postFormData } from '../services/RegisterApi';
+import Spinner from 'react-bootstrap/Spinner';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
-function FormLogin() {
-  const { Formik } = formik;
+interface FormValues {
+  nombre: string;
+  email: string;
+  contrasena: string;
+  repeatContrasena: string;
+  direccion: string;
+  codigo_postal: number | '';
+  terms: boolean;
+}
+interface ApiResponse {
+  message: string;
+}
+const validationSchema = yup.object().shape({
+  nombre: yup.string().required('El nombre es obligatorio'),
+  email: yup.string().email('Email inválido').required('El email es obligatorio'),
+  contrasena: yup.string().required('La contraseña es obligatoria'),
+  repeatContrasena: yup.string()
+    .oneOf([yup.ref('contrasena')], 'Las contraseñas deben coincidir')
+    .required('Repite la contraseña'),
+  direccion: yup.string().required('La dirección es obligatoria'),
+  codigo_postal: yup.number()
+    .typeError('Debe ser un número')
+    .required('El código postal es obligatorio')
+    .positive('Debe ser positivo')
+    .integer('Debe ser un entero'),
+  terms: yup.bool().oneOf([true], 'Debes aceptar los términos'),
+});
 
-  const schema = yup.object().shape({
-    name: yup.string().required(),
-    email: yup.string().email().required(),
-    password: yup.string().required(),
-    repeatPassword: yup.string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required(),
-    terms: yup.bool().required().oneOf([true], 'Terms must be accepted'),
-  });
+const initialValues: FormValues = {
+  nombre: '',
+  email: '',
+  contrasena: '',
+  repeatContrasena: '',
+  direccion: '',
+  codigo_postal: '',
+  terms: false,
+};
+
+function FormRegister() {
+  const navigate = useNavigate();
+  const [responseData, setResponseData] = useState<ApiResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+
+  // const login = () => {
+  //   setCookie('user', 'María', { path: '/', maxAge: 3600 });
+  // };
+
+  const handleSubmit = async (
+    values: FormValues,
+    { setSubmitting }: FormikHelpers<FormValues>
+  ) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await postFormData<FormValues, ApiResponse>(
+        'https://127.0.0.1:8000/api/usuario/crear',
+        values
+      );
+      setResponseData(result);
+    } catch (err: any) {
+      if (err instanceof TypeError) {
+        setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
+      } else {
+        let errorObj = JSON.parse(err.message ); 
+        setError(errorObj.error || 'Error desconocido');
+      }
+    } finally {
+      setCookie('user', values.email, { path: '/', maxAge: 3600 });
+      setIsLoading(false);
+      setSubmitting(false);
+      navigate('/')
+    }
+  };
   return (
-    <Formik
-      validationSchema={schema}
-      initialValues={{
-        name: '',
-        email: '',
-        password: '',
-        repeatPassword: '',
-        terms: false,
-      }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          setSubmitting(false);
-        }, 400);
-      }}
-    >
-      {({ handleSubmit, handleChange, values, errors }) => (
-        <Form noValidate onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label htmlFor="inlineFormInputName">
-              Name
-            </Form.Label>
-            <Form.Control
-              required
-              type="text"
-              name="name"
-              id="inlineFormInputName"
-              value={values.name}
-              placeholder="Jane Doe"
-              onChange={handleChange}
-              isInvalid={!!errors.name}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.name}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label htmlFor="inlineFormInputGroupUsername">
-              Email address
-            </Form.Label>
-            <InputGroup hasValidation>
-              <InputGroup.Text>@</InputGroup.Text>
+    <Container className="py-4">
+      <h1>Registrarse</h1>
+      <Formik
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, handleChange, values, errors }) => (
+          <FormikForm noValidate>
+            <Form.Group className="mb-3">
+              <Form.Label>Nombre</Form.Label>
               <Form.Control
-                id="inlineFormInputGroupEmail"
-                placeholder="Email"
-                aria-describedby="inputGroupPrepend"
-                type="email"
-                name='email'
-                value={values.email}
-                required
+                type="text"
+                name="nombre"
+                value={values.nombre}
+                placeholder="Jane Doe"
                 onChange={handleChange}
-                isInvalid={!!errors.email}
+                isInvalid={!!errors.nombre}
               />
-              <Form.Control.Feedback type="invalid" tooltip>
-                {errors.email}
+              <Form.Control.Feedback type="invalid">
+                {errors.nombre}
               </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
-          <Form.Label htmlFor="inlineFormInputGroupPassword">
-            Password
-          </Form.Label>
-          <InputGroup>
-            <InputGroup.Text>🔒</InputGroup.Text>
-            <Form.Control
-              id="inlineFormInputGroupPassword"
-              placeholder="Password"
-              type="password"
-              aria-describedby="inputGroupPrepend"
-              name='password'
-              value={values.password}
-              required
-              onChange={handleChange}
-              isInvalid={!!errors.password}
-            />
-            <Form.Control.Feedback type="invalid" tooltip>
-              {errors.password}
-            </Form.Control.Feedback>
-          </InputGroup>
-          <Form.Label htmlFor="inlineFormInputGroupPassword">
-            Repeat Password
-          </Form.Label>
-          <InputGroup>
-            <InputGroup.Text>🔒</InputGroup.Text>
-            <Form.Control
-              id="inlineFormInputGroupRepeatPassword"
-              placeholder="Repeat password"
-              type="password"
-              aria-describedby="inputGroupPrepend"
-              name='repeatPassword'
-              value={values.repeatPassword}
-              required
-              onChange={handleChange}
-              isInvalid={!!errors.repeatPassword}
-            />
-            <Form.Control.Feedback type="invalid" tooltip>
-              {errors.repeatPassword}
-            </Form.Control.Feedback>
-          </InputGroup>
-          <Form.Group className="mb-3">
-            <Form.Check
-              required
-              name="terms"
-              label="Agree to terms and conditions"
-              onChange={handleChange}
-              isInvalid={!!errors.terms}
-              feedback={errors.terms}
-              feedbackType="invalid"
-              id="validationFormik0"
-            />
-          </Form.Group>
-          <Container>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Email address</Form.Label>
+              <InputGroup hasValidation>
+                <InputGroup.Text>@</InputGroup.Text>
+                <Form.Control
+                  placeholder="Email"
+                  type="email"
+                  name='email'
+                  value={values.email}
+                  onChange={handleChange}
+                  isInvalid={!!errors.email}
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {errors.email}
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Contraseña</Form.Label>
+              <InputGroup hasValidation>
+                <InputGroup.Text>🔒</InputGroup.Text>
+                <Form.Control
+                  type="password"
+                  name="contrasena"
+                  value={values.contrasena}
+                  onChange={handleChange}
+                  isInvalid={!!errors.contrasena}
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {errors.contrasena}
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Repite la contraseña</Form.Label>
+              <InputGroup hasValidation>
+                <InputGroup.Text>🔒</InputGroup.Text>
+                <Form.Control
+                  type="password"
+                  name="repeatContrasena"
+                  value={values.repeatContrasena}
+                  onChange={handleChange}
+                  isInvalid={!!errors.repeatContrasena}
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {errors.repeatContrasena}
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Dirección</Form.Label>
+              <Form.Control
+                type="text"
+                name="direccion"
+                value={values.direccion}
+                onChange={handleChange}
+                isInvalid={!!errors.direccion}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.direccion}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Código Postal</Form.Label>
+              <Form.Control
+                type="text"
+                name="codigo_postal"
+                value={values.codigo_postal}
+                onChange={handleChange}
+                isInvalid={!!errors.codigo_postal}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.codigo_postal}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                name="terms"
+                label="Acepto términos y condiciones"
+                onChange={handleChange}
+                isInvalid={!!errors.terms}
+                feedback={errors.terms}
+                feedbackType="invalid"
+              />
+            </Form.Group>
+
             <Row>
-              <Col><Button type="submit" className="p-2" variant="outline-primary">Login</Button></Col>
-              <Col><a href="/"><Button className="p-2" variant="outline-secondary">Back</Button></a></Col>
+              <Col>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || isLoading}
+                  // onSubmit={}
+                >
+                  {isSubmitting || isLoading ? <Spinner animation="grow" /> : 'Register'}
+                </Button>
+              </Col>
+              <Col><a href="/"><Button className="p-2" variant="outline-secondary">Volver</Button></a></Col>
             </Row>
-          </Container>
-        </Form>
+          </FormikForm>
+        )}
+      </Formik>
+      {error && <p className="text-danger mt-3">{error}</p>}
+      {responseData && (
+        <div className="mt-3">
+          <h2>Respuesta de la API</h2>
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+        </div>
       )}
-    </Formik>
+    </Container>
   );
 }
 
-export default FormLogin;
+export default FormRegister;
