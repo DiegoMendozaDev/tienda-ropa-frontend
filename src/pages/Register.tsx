@@ -50,12 +50,12 @@ function FormRegister() {
   const [responseData, setResponseData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  // @ts-ignore: TS6133
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
 
   // const login = () => {
   //   setCookie('user', 'María', { path: '/', maxAge: 3600 });
   // };
-
   const handleSubmit = async (
     values: FormValues,
     { setSubmitting }: FormikHelpers<FormValues>
