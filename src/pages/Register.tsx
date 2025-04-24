@@ -41,21 +41,19 @@ const initialValues: FormValues = {
   contrasena: '',
   repeatContrasena: '',
   direccion: '',
-  codigo_postal: '',
+  codigo_postal: 0,
   terms: false,
 };
 
 function FormRegister() {
   const navigate = useNavigate();
+  // @ts-ignore: TS6133
   const [responseData, setResponseData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // @ts-ignore: TS6133
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
 
-  // const login = () => {
-  //   setCookie('user', 'María', { path: '/', maxAge: 3600 });
-  // };
   const handleSubmit = async (
     values: FormValues,
     { setSubmitting }: FormikHelpers<FormValues>
@@ -68,6 +66,8 @@ function FormRegister() {
         values
       );
       setResponseData(result);
+      setCookie('user', values.email, { path: '/', maxAge: 3600 });
+      navigate('/')
     } catch (err: any) {
       if (err instanceof TypeError) {
         setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
@@ -76,10 +76,8 @@ function FormRegister() {
         setError(errorObj.error || 'Error desconocido');
       }
     } finally {
-      setCookie('user', values.email, { path: '/', maxAge: 3600 });
       setIsLoading(false);
       setSubmitting(false);
-      navigate('/')
     }
   };
   return (
@@ -213,12 +211,6 @@ function FormRegister() {
         )}
       </Formik>
       {error && <p className="text-danger mt-3">{error}</p>}
-      {responseData && (
-        <div className="mt-3">
-          <h2>Respuesta de la API</h2>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
-        </div>
-      )}
     </Container>
   );
 }
