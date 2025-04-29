@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Formik, Form as FormikForm, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
-import { postFormData } from '../services/RegisterApi';
+import { postFormData } from '../services/PostService';
 import Spinner from 'react-bootstrap/Spinner';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';

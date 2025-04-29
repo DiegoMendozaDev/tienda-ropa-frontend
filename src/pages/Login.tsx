@@ -4,96 +4,151 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
-import * as formik from 'formik';
 import * as yup from 'yup';
+import { Formik, Form as FormikForm, FormikHelpers } from 'formik';
+import { useState } from 'react';
+import { postFormData } from '../services/PostService';
+import { useNavigate } from 'react-router-dom';
+import Spinner from 'react-bootstrap/Spinner';
+import { useCookies } from 'react-cookie';
 
+interface FormValues {
+  email: string;
+  contrasena: string;
+  rememberMe: boolean;
+}
+interface ApiResponse {
+  message: string;
+}
+const validationSchema = yup.object().shape({
+  email: yup.string().email('Email inválido').required('El email es obligatorio'),
+  contrasena: yup.string().required('La contraseña es obligatoria'),
+});
+const initialValues: FormValues = {
+  email: '',
+  contrasena: '',
+  rememberMe: false,
+};
 function FormLogin() {
-  const { Formik } = formik;
-
-  const schema = yup.object().shape({
-    email: yup.string().email().required(),
-    password: yup.string().required(),
-    repeatPassword: yup.string().required(),
-    rememberMe: yup.bool(),
-  });
+  const navigate = useNavigate();
+  // @ts-ignore: TS6133
+  const [responseData, setResponseData] = useState<ApiResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  // @ts-ignore: TS6133
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+    const handleSubmit = async (
+      values: FormValues,
+      { setSubmitting }: FormikHelpers<FormValues>
+    ) => {
+      setError(null);
+      setIsLoading(true);
+      try {
+        const result = await postFormData<FormValues, ApiResponse>(
+          'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
+          values
+        );
+        setResponseData(result);
+        setCookie('user', values.email, { path: '/', maxAge: 3600 });
+        navigate('/')
+      } catch (err: any) {
+        if (err instanceof TypeError) {
+          setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
+        } else {
+          let errorObj = JSON.parse(err.message ); 
+          setError(errorObj.error || 'Error desconocido');
+        }
+      } finally {
+        setIsLoading(false);
+        setSubmitting(false);
+      }
+    };
   return (
-    <Formik
-      validationSchema={schema}
-      initialValues={{
-        email: '',
-        password: '',
-        rememberMe: false,
-      }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          setSubmitting(false);
-        }, 400);
-      }}
-    >
-      {({ handleSubmit, handleChange, values, errors }) => (
-        <Form noValidate onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label htmlFor="inlineFormInputGroupUsername">
-              Email address
-            </Form.Label>
-            <InputGroup hasValidation>
-              <InputGroup.Text>@</InputGroup.Text>
-              <Form.Control
-                id="inlineFormInputGroupEmail"
-                placeholder="Email"
-                aria-describedby="inputGroupPrepend"
-                type="email"
-                name='email'
-                value={values.email}
-                required
+    <Container className="py-4">
+      <h1>Iniciar Sesión</h1>
+      <Formik
+        validationSchema={validationSchema}
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, handleChange, values, errors }) => (
+          <FormikForm noValidate>
+            <Form.Group className="mb-3">
+              <Form.Label>Email address</Form.Label>
+              <InputGroup hasValidation>
+                <InputGroup.Text>@</InputGroup.Text>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  placeholder="Email"
+                  onChange={handleChange}
+                  isInvalid={!!errors.email}
+                  required
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {errors.email}
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Contraseña</Form.Label>
+              <InputGroup hasValidation>
+                <InputGroup.Text>🔒</InputGroup.Text>
+                <Form.Control
+                  type="password"
+                  name="contrasena"
+                  value={values.contrasena}
+                  placeholder="Contraseña"
+                  onChange={handleChange}
+                  isInvalid={!!errors.contrasena}
+                  required
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {errors.contrasena}
+                </Form.Control.Feedback>
+              </InputGroup>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formRememberMe">
+              <Form.Check
+                type="checkbox"
+                name="rememberMe"
+                label="Recuérdame"
+                checked={values.rememberMe}
                 onChange={handleChange}
-                isInvalid={!!errors.email}
               />
-              <Form.Control.Feedback type="invalid">
-                {errors.email}
-              </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
-          <Form.Label htmlFor="inlineFormInputGroupPassword">
-            Password
-          </Form.Label>
-          <InputGroup>
-            <InputGroup.Text>🔒</InputGroup.Text>
-            <Form.Control
-              id="inlineFormInputGroupPassword"
-              placeholder="Password"
-              type="password"
-              aria-describedby="inputGroupPrepend"
-              name='password'
-              value={values.password}
-              required
-              onChange={handleChange}
-              isInvalid={!!errors.password}
-            />
-            <Form.Control.Feedback type="invalid" tooltip>
-              {errors.password}
-            </Form.Control.Feedback>
-          </InputGroup>
-          <Form.Group className="mb-3" id="formGridCheckbox">
-            <Form.Check
-              type="checkbox"
-              id="autoSizingCheck2"
-              label="rememberMe"
-              name='rememberMe'
-              checked={values.rememberMe}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Container>
+            </Form.Group>
+
             <Row>
-              <Col><Button type="submit" className="p-2" variant="outline-primary">Login</Button></Col>
-              <Col><Button className="p-2" variant="outline-secondary" href="/">Back</Button></Col>
+              <Col>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || isLoading}
+                >
+                  {isSubmitting || isLoading ? (
+                    <Spinner animation="grow" size="sm" />
+                  ) : (
+                    'Login'
+                  )}
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  variant="outline-secondary"
+                  href="/"
+                  className="p-2"
+                >
+                  Volver
+                </Button>
+              </Col>
             </Row>
-          </Container>
-        </Form>
-      )}
-    </Formik>
+          </FormikForm>
+        )}
+      </Formik>
+      {error && <p className="text-danger mt-3">{error}</p>}
+    </Container>
   );
 }
 
