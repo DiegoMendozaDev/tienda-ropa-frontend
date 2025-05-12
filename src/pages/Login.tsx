@@ -37,32 +37,32 @@ function FormLogin() {
   const [isLoading, setIsLoading] = useState(false);
   // @ts-ignore: TS6133
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
-    const handleSubmit = async (
-      values: FormValues,
-      { setSubmitting }: FormikHelpers<FormValues>
-    ) => {
-      setError(null);
-      setIsLoading(true);
-      try {
-        const result = await postFormData<FormValues, ApiResponse>(
-          'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
-          values
-        );
-        setResponseData(result);
-        setCookie('user', values.email, { path: '/', maxAge: 3600 });
-        navigate('/')
-      } catch (err: any) {
-        if (err instanceof TypeError) {
-          setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
-        } else {
-          let errorObj = JSON.parse(err.message ); 
-          setError(errorObj.error || 'Error desconocido');
-        }
-      } finally {
-        setIsLoading(false);
-        setSubmitting(false);
+  const handleSubmit = async (
+    values: FormValues,
+    { setSubmitting }: FormikHelpers<FormValues>
+  ) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await postFormData<FormValues, ApiResponse>(
+        'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
+        values
+      );
+      setResponseData(result);
+      setCookie('user', values.email, { path: '/', maxAge: 3600 });
+      navigate('/')
+    } catch (err: any) {
+      if (err instanceof TypeError) {
+        setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
+      } else {
+        let errorObj = JSON.parse(err.message);
+        setError(errorObj.error || 'Error desconocido');
       }
-    };
+    } finally {
+      setIsLoading(false);
+      setSubmitting(false);
+    }
+  };
   return (
     <Container className="py-4">
       <h1>Iniciar Sesión</h1>
@@ -121,29 +121,34 @@ function FormLogin() {
               />
             </Form.Group>
 
-            <Row>
-              <Col>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || isLoading}
-                >
-                  {isSubmitting || isLoading ? (
-                    <Spinner animation="grow" size="sm" />
-                  ) : (
-                    'Login'
-                  )}
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  variant="outline-secondary"
-                  href="/"
-                  className="p-2"
-                >
-                  Volver
-                </Button>
-              </Col>
-            </Row>
+            {isSubmitting || isLoading ? (
+              <Spinner animation="grow" size="sm" />
+            ) : (
+              <Row>
+                <Col>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || isLoading}
+                  >
+                    {isSubmitting || isLoading ? (
+                      <Spinner animation="grow" size="sm" />
+                    ) : (
+                      'Login'
+                    )}
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    variant="outline-secondary"
+                    href="/"
+                    className="p-2"
+                  >
+                    Volver
+                  </Button>
+
+                </Col>
+              </Row>
+            )}
           </FormikForm>
         )}
       </Formik>

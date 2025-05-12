@@ -1,10 +1,10 @@
 import NavScroll from "../components/NavScroll.tsx";
-import Carrousel from "../components/Carrousel.tsx";
+import Carrusel from "../components/Carrusel.tsx";
 function Inicio(){
     return (
-        <div>
+        <div style={{ paddingTop: '100px' }}>
             <NavScroll />
-            <Carrousel/>
+            <Carrusel/>
             <h1>INICIO</h1>
         </div>
     );

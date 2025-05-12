@@ -34,18 +34,18 @@ function NavScroll() {
               <List size={26} className="ml-4" />
             </Button>
             <div className='d-none d-sm-flex align-items-center gap-3'>
-            <Nav className="w-100" navbarScroll>
-              <Form className="d-flex w-100 justify-content-center">
-                <Form.Control
-                  type="search"
-                  placeholder="Search"
-                  className="me-2"
-                  aria-label="Search"
-                  style={{ maxWidth: '300px' }}
-                />
-                <Button variant="outline-success">Search</Button>
-              </Form>
-            </Nav>
+              <Nav className="w-100" navbarScroll>
+                <Form className="d-flex w-100 justify-content-center">
+                  <Form.Control
+                    type="search"
+                    placeholder="Search"
+                    className="me-2"
+                    aria-label="Search"
+                    style={{ maxWidth: '300px' }}
+                  />
+                  <Button variant="outline-success">Search</Button>
+                </Form>
+              </Nav>
             </div>
           </div>
 
@@ -56,19 +56,18 @@ function NavScroll() {
 
           {/* Derecha: iconos clicables y botones de Login/Register */}
           <div className="d-flex align-items-center gap-4">
-            <Nav.Link href="/profile">
-              <Person size={26} />
-            </Nav.Link>
-            <Nav.Link href="/cart">
-              <Bag size={26} />
-            </Nav.Link>
-            <Nav.Link href="/favorites">
-              <Heart size={26} />
-            </Nav.Link>
-
             {/* Renderiza Login/Register si no está logueado, sino Logout */}
             {isLoggedIn ? (
               <div className="d-flex align-items-center gap-2 ms-3">
+                <Nav.Link href="/profile">
+                  <Person size={26} />
+                </Nav.Link>
+                <Nav.Link href="/cart">
+                  <Bag size={26} />
+                </Nav.Link>
+                <Nav.Link href="/favorites">
+                  <Heart size={26} />
+                </Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>
               </div>
             ) : (
@@ -88,15 +87,15 @@ function NavScroll() {
           <Offcanvas.Body>
             I will not close if you click outside of me.
             <div className='d-block d-sm-none'>
-            <Form className="d-flex mb-3">
-              <Form.Control
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                className="me-2"
-              />
-              <Button variant="outline-success">Search</Button>
-            </Form>
+              <Form className="d-flex mb-3">
+                <Form.Control
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  className="me-2"
+                />
+                <Button variant="outline-success">Search</Button>
+              </Form>
             </div>
 
           </Offcanvas.Body>

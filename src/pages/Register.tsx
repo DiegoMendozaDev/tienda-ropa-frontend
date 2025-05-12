@@ -72,7 +72,7 @@ function FormRegister() {
       if (err instanceof TypeError) {
         setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
       } else {
-        let errorObj = JSON.parse(err.message ); 
+        let errorObj = JSON.parse(err.message);
         setError(errorObj.error || 'Error desconocido');
       }
     } finally {
@@ -194,19 +194,22 @@ function FormRegister() {
                 feedbackType="invalid"
               />
             </Form.Group>
-
-            <Row>
-              <Col>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || isLoading}
+            {isSubmitting || isLoading ? (
+              <Spinner animation="grow" size="sm" />
+            ) : (
+              <Row>
+                <Col>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || isLoading}
                   // onSubmit={}
-                >
-                  {isSubmitting || isLoading ? <Spinner animation="grow" /> : 'Register'}
-                </Button>
-              </Col>
-              <Col><a href="/"><Button className="p-2" variant="outline-secondary">Volver</Button></a></Col>
-            </Row>
+                  >
+                    {isSubmitting || isLoading ? <Spinner animation="grow" /> : 'Register'}
+                  </Button>
+                </Col>
+                <Col><a href="/"><Button className="p-2" variant="outline-secondary">Volver</Button></a></Col>
+              </Row>
+            )}
           </FormikForm>
         )}
       </Formik>
