@@ -1,5 +1,5 @@
 import Carousel from 'react-bootstrap/Carousel';
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getFormData } from '../services/GetService';
 // Define el tipo que la API devuelve para cada slide
 interface Slide {
@@ -7,11 +7,7 @@ interface Slide {
   nombre: string;
   descripcion: string;
 }
-const slides = [
-  { src: '/assets/imgs/camisa_blanca.jpg', alt: 'First slide', captionTitle: 'First slide label', captionText: 'Nulla vitae elit libero…' },
-  { src: '/assets/imgs/pantalon_LV.jpg', alt: 'Second slide', captionTitle: 'Second slide label', captionText: 'Lorem ipsum dolor…' },
-  { src: '/assets/imgs/vestido_rosa.jpg', alt: 'Third slide', captionTitle: 'Third slide label', captionText: 'Praesent commodo cursus…' },
-];
+
 
 function Carrusel() {
   const [slides, setSlides] = useState<Slide[] | null>(null);
