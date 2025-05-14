@@ -31,10 +31,12 @@ const initialValues: FormValues = {
 };
 function FormLogin() {
   const navigate = useNavigate();
+  // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [responseData, setResponseData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const handleSubmit = async (
