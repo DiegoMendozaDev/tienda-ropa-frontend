@@ -9,7 +9,7 @@ import { Bag, Heart, List, Person } from 'react-bootstrap-icons';
 import { useCookies } from 'react-cookie';
 
 function NavScroll() {
-  // @ts-ignore: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [show, setShow] = useState(false);
 

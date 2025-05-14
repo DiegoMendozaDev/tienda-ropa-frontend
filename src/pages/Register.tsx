@@ -47,11 +47,11 @@ const initialValues: FormValues = {
 
 function FormRegister() {
   const navigate = useNavigate();
-  // @ts-ignore: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [responseData, setResponseData] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // @ts-ignore: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
 
   const handleSubmit = async (
@@ -68,11 +68,12 @@ function FormRegister() {
       setResponseData(result);
       setCookie('user', values.email, { path: '/', maxAge: 3600 });
       navigate('/')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err instanceof TypeError) {
         setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
       } else {
-        let errorObj = JSON.parse(err.message);
+        const errorObj = JSON.parse(err.message);
         setError(errorObj.error || 'Error desconocido');
       }
     } finally {
