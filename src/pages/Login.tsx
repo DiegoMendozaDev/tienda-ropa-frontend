@@ -68,94 +68,97 @@ function FormLogin() {
   };
   return (
     <Container className="py-4">
-      <h1>Iniciar Sesión</h1>
-      <Formik
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting, handleChange, values, errors }) => (
-          <FormikForm noValidate>
-            <Form.Group className="mb-3">
-              <Form.Label>Email address</Form.Label>
-              <InputGroup hasValidation>
-                <InputGroup.Text>@</InputGroup.Text>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  value={values.email}
-                  placeholder="Email"
-                  onChange={handleChange}
-                  isInvalid={!!errors.email}
-                  required
-                />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  {errors.email}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-8 col-lg-6">
+          <h1>Iniciar Sesión</h1>
+          <Formik
+            validationSchema={validationSchema}
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting, handleChange, values, errors }) => (
+              <FormikForm noValidate>
+                <Form.Group className="mb-3">
+                  <Form.Label>Email address</Form.Label>
+                  <InputGroup hasValidation>
+                    <InputGroup.Text>@</InputGroup.Text>
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={values.email}
+                      placeholder="Email"
+                      onChange={handleChange}
+                      isInvalid={!!errors.email}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid" tooltip>
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Contraseña</Form.Label>
+                  <InputGroup hasValidation>
+                    <InputGroup.Text>🔒</InputGroup.Text>
+                    <Form.Control
+                      type="password"
+                      name="contrasena"
+                      value={values.contrasena}
+                      placeholder="Contraseña"
+                      onChange={handleChange}
+                      isInvalid={!!errors.contrasena}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid" tooltip>
+                      {errors.contrasena}
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Contraseña</Form.Label>
-              <InputGroup hasValidation>
-                <InputGroup.Text>🔒</InputGroup.Text>
-                <Form.Control
-                  type="password"
-                  name="contrasena"
-                  value={values.contrasena}
-                  placeholder="Contraseña"
-                  onChange={handleChange}
-                  isInvalid={!!errors.contrasena}
-                  required
-                />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  {errors.contrasena}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="formRememberMe">
+                  <Form.Check
+                    type="checkbox"
+                    name="rememberMe"
+                    label="Recuérdame"
+                    checked={values.rememberMe}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formRememberMe">
-              <Form.Check
-                type="checkbox"
-                name="rememberMe"
-                label="Recuérdame"
-                checked={values.rememberMe}
-                onChange={handleChange}
-              />
-            </Form.Group>
+                {isSubmitting || isLoading ? (
+                  <Spinner animation="grow" size="sm" />
+                ) : (
+                  <Row>
+                    <Col>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting || isLoading}
+                      >
+                        {isSubmitting || isLoading ? (
+                          <Spinner animation="grow" size="sm" />
+                        ) : (
+                          'Login'
+                        )}
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button
+                        variant="outline-secondary"
+                        href="/"
+                        className="p-2"
+                      >
+                        Volver
+                      </Button>
 
-            {isSubmitting || isLoading ? (
-              <Spinner animation="grow" size="sm" />
-            ) : (
-              <Row>
-                <Col>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || isLoading}
-                  >
-                    {isSubmitting || isLoading ? (
-                      <Spinner animation="grow" size="sm" />
-                    ) : (
-                      'Login'
-                    )}
-                  </Button>
-                </Col>
-                <Col>
-                  <Button
-                    variant="outline-secondary"
-                    href="/"
-                    className="p-2"
-                  >
-                    Volver
-                  </Button>
-
-                </Col>
-              </Row>
+                    </Col>
+                  </Row>
+                )}
+              </FormikForm>
             )}
-          </FormikForm>
-        )}
-      </Formik>
-      {error && <p className="text-danger mt-3">{error}</p>}
+          </Formik>
+          {error && <p className="text-danger mt-3">{error}</p>}
+        </div>
+      </div>
     </Container>
   );
 }

@@ -1,6 +1,7 @@
 import Carousel from 'react-bootstrap/Carousel';
 import { useEffect, useState } from "react";
 import { getFormData } from '../services/GetService';
+import Spinner from 'react-bootstrap/Spinner';
 // Define el tipo que la API devuelve para cada slide
 interface Slide {
   foto: string;
@@ -24,8 +25,17 @@ function Carrusel() {
     return <div>Error cargando slides: {error}</div>;
   }
 
-  if (!slides) {
-    return <div>Cargando slides...</div>;
+  if (slides === null) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+        <Spinner animation="border" role="status" aria-hidden="true" />{" "}
+        <span className="visually-hidden">Cargando slides...</span>
+      </div>
+    );
+  }
+    // Petición OK pero array vacío
+  if (slides.length === 0) {
+    return <div>No hay slides disponibles.</div>;
   }
   return (
     <Carousel data-bs-theme="dark">
@@ -35,7 +45,7 @@ function Carrusel() {
             className="d-block w-100"
             src={foto}
             style={{
-              maxHeight: '500px',
+              maxHeight: '600px',
             }}
           />
           <Carousel.Caption>

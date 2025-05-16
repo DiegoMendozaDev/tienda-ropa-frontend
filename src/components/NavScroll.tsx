@@ -5,74 +5,101 @@ import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { Bag, Heart, List, Person } from 'react-bootstrap-icons';
+import { Bag, Heart, List, Person, X, ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import { useCookies } from 'react-cookie';
+
+// Tipo para categorías
+interface Category {
+  id: string;
+  nombre: string;
+  subcategorias?: Category[];
+}
+
+// Datos de ejemplo
+const categorias: Category[] = [
+  {
+    id: '1',
+    nombre: 'Regalos y Personalización',
+    subcategorias: [
+      { id: '1-1', nombre: 'Regalos para ella' },
+      { id: '1-2', nombre: 'Regalos para él' },
+      { id: '1-3', nombre: 'Regalos para parejas' },
+      { id: '1-4', nombre: 'Regalos para bebés' },
+      { id: '1-5', nombre: 'Regalos para mascotas' },
+      { id: '1-6', nombre: 'Regalos Louis Vuitton' },
+      { id: '1-7', nombre: 'Personalización' },
+    ]
+  },
+  { id: '2', nombre: 'Novedades' },
+  { id: '3', nombre: 'Bolsos y pequeña marroquinería' },
+  { id: '4', nombre: 'Mujer' },
+  { id: '5', nombre: 'Hombre' },
+  { id: '6', nombre: 'Joyería' },
+  { id: '7', nombre: 'Relojería' },
+  { id: '8', nombre: 'Perfumes' },
+  { id: '9', nombre: 'Baúles, Viaje y Hogar' },
+  { id: '10', nombre: 'Servicios' },
+];
 
 function NavScroll() {
   // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [show, setShow] = useState(false);
+  const [selectedCat, setSelectedCat] = useState<Category | null>(null);
 
   const isLoggedIn = Boolean(cookies.user);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
-  // Función para cerrar sesión: elimina la cookie y puede redirigir o actualizar
+  const handleClose = () => {
+    setShow(false);
+    setSelectedCat(null);
+  };
+  const handleShow = () => setShow(true);
   const logout = () => {
     removeCookie('user', { path: '/' });
-    // Opcional: redirigir o refrescar la página
     window.location.reload();
   };
+
   return (
-    <Navbar fixed="top" expand="sm" className="ms-auto d-flex bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
+    <Navbar fixed="top" expand="sm" className="bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
       <Container fluid>
-        {/* Contenedor principal con tres secciones: izquierda, centro y derecha */}
         <div className="d-flex w-100 align-items-center">
-          {/* Izquierda: botón offcanvas y primer enlace */}
-          <div className="d-flex align-items-center gap-3">
-            <Button variant="outline-secondary" onClick={handleShow}>
-              <List size={26} className="ml-4" />
-            </Button>
-            <div className='d-none d-sm-flex align-items-center gap-3'>
-              <Nav className="w-100" navbarScroll>
-                <Form className="d-flex w-100 justify-content-center">
-                  <Form.Control
-                    type="search"
-                    placeholder="Search"
-                    className="me-2"
-                    aria-label="Search"
-                    style={{ maxWidth: '300px' }}
-                  />
-                  <Button variant="outline-success">Search</Button>
-                </Form>
-              </Nav>
-            </div>
+          {/* Botón Offcanvas */}
+          <Button variant="outline-secondary" onClick={handleShow}>
+            <List size={26} />
+          </Button>
+
+          {/* Buscador (solo en sm+) */}
+          <div className="d-none d-sm-flex align-items-center gap-3 ms-3">
+            <Nav className="w-100" navbarScroll>
+              <Form className="d-flex w-100 justify-content-center">
+                <Form.Control
+                  type="search"
+                  placeholder="Search"
+                  className="me-2"
+                  style={{ maxWidth: '300px' }}
+                />
+                <Button variant="outline-success">Search</Button>
+              </Form>
+            </Nav>
           </div>
 
-          {/* Centro: marca centrada */}
+          {/* Marca centrada */}
           <Navbar.Brand href="#" className="mx-auto" style={{ padding: '1rem' }}>
             Navbar scroll
           </Navbar.Brand>
 
-          {/* Derecha: iconos clicables y botones de Login/Register */}
+          {/* Iconos y botones de usuario */}
           <div className="d-flex align-items-center gap-4">
-            {/* Renderiza Login/Register si no está logueado, sino Logout */}
             {isLoggedIn ? (
-              <div className="d-flex align-items-center gap-2 ms-3">
-                <Nav.Link href="/profile">
-                  <Person size={26} />
-                </Nav.Link>
-                <Nav.Link href="/cart">
-                  <Bag size={26} />
-                </Nav.Link>
-                <Nav.Link href="/favorites">
-                  <Heart size={26} />
-                </Nav.Link>
+              <div className="d-flex align-items-center gap-2">
+                <Nav.Link href="/profile"><Person size={26} /></Nav.Link>
+                <Nav.Link href="/cart"><Bag size={26} /></Nav.Link>
+                <Nav.Link href="/favorites"><Heart size={26} /></Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>
               </div>
             ) : (
-              <div className="d-flex ms-3">
+              <div className="d-flex">
                 <Button variant="outline-primary" className="me-2" href="/login">Login</Button>
                 <Button variant="outline-secondary" href="/register">Register</Button>
               </div>
@@ -80,25 +107,68 @@ function NavScroll() {
           </div>
         </div>
 
-        {/* Offcanvas */}
-        <Offcanvas show={show} onHide={handleClose} backdrop="static">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+        {/* Offcanvas con MegaMenu */}
+        <Offcanvas show={show} onHide={handleClose} placement="start" style={{ width: '100%', maxWidth: 800 }}>
+          <Offcanvas.Header>
+            {/* Botón atrás solo si hay subcategoría abierta */}
+            {selectedCat && (
+              <Button variant="link" onClick={() => setSelectedCat(null)}>
+                <ChevronLeft size={24} />
+              </Button>
+            )}
+            <Offcanvas.Title className="ms-2">
+              {selectedCat ? selectedCat.nombre : 'Categorías'}
+            </Offcanvas.Title>
+            <Button variant="link" className="ms-auto" onClick={handleClose}>
+              <X size={24} />
+            </Button>
           </Offcanvas.Header>
-          <Offcanvas.Body>
-            I will not close if you click outside of me.
-            <div className='d-block d-sm-none'>
-              <Form className="d-flex mb-3">
-                <Form.Control
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                  className="me-2"
-                />
-                <Button variant="outline-success">Search</Button>
-              </Form>
-            </div>
+          <Offcanvas.Body style={{ padding: 0, height: '100%' }}>
+            <div style={{ display: 'flex', height: '100%' }}>
+              {/* Panel categorías principales */}
+              <div
+                style={{
+                  width: '40%',
+                  borderRight: '1px solid #dee2e6',
+                  overflowY: 'auto'
+                }}
+              >
+                {categorias.map(cat => (
+                  <div
+                    key={cat.id}
+                    onClick={() => cat.subcategorias ? setSelectedCat(cat) : window.location.href = `/categoria/${cat.id}`}
+                    className="p-3 d-flex justify-content-between align-items-center"
+                    style={{ cursor: 'pointer', background: selectedCat?.id === cat.id ? '#f8f9fa' : undefined }}
+                  >
+                    <span>{cat.nombre}</span>
+                    {cat.subcategorias && <ChevronRight />}
+                  </div>
+                ))}
+              </div>
 
+              {/* Panel subcategorías: se monta SOLO si hay categoría seleccionada */}
+              {selectedCat && (
+                <div
+                  style={{
+                    width: '60%',
+                    overflowY: 'auto',
+                    background: '#fff',
+                    transition: 'width 0.3s ease'
+                  }}
+                >
+                  {selectedCat.subcategorias?.map(sub => (
+                    <div
+                      key={sub.id}
+                      onClick={() => window.location.href = `/categoria/${sub.id}`}
+                      className="p-3"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {sub.nombre}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </Offcanvas.Body>
         </Offcanvas>
       </Container>
