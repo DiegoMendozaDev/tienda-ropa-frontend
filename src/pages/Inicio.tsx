@@ -15,7 +15,7 @@ function Inicio() {
             }
             // eslint-disable-next-line prefer-const
             let id = getCookieValue("id")
-            fetch('https://127.0.0.1:8000/api/pedido/create', {
+            fetch('https://tienda-ropa-backend-xku2.onrender.com/api/pedido/create', {
                 method: 'POST',
                 body: JSON.stringify({
                     "id_usuario": id,
@@ -36,13 +36,12 @@ function Inicio() {
             // eslint-disable-next-line prefer-const
             let idpedido = getCookieValue("id_pedido");
                 
-            fetch('https://127.0.0.1:8000/api/detalle/create', {
+            fetch('https://tienda-ropa-backend-xku2.onrender.com/api/detalle/create', {
                 method: 'POST',
                 body: JSON.stringify({
                     "id_producto": product.id,
                     "id_pedido": idpedido,
                     "cantidad": 1
-
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,7 +61,7 @@ function Inicio() {
             <NavScroll onSearchChange={setSearch}/>
             <Carrusel />
             <ProductCards
-                url="https://127.0.0.1:8000/api/productos/ver"
+                url="https://tienda-ropa-backend-xku2.onrender.com/api/productos/ver"
                 onAddToCart={handleAddToCart}
                 search={search}
             />

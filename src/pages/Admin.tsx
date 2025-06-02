@@ -15,7 +15,7 @@ interface Usuario {
   id: number;
   nombre: string;
   email: string;
-  rol: string;
+  roles: Array<string>;
   direccion: string,
   codigo_postal: number
 }
@@ -44,21 +44,21 @@ const Admin: React.FC = () => {
   }, []);
 
   const fetchProductos = () => {
-    fetch('httpss://127.0.0.1:8000/api/productos/ver')
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/ver')
       .then(res => res.json())
       .then(data => setProductos(data))
       .catch(err => console.error('Error al cargar productos:', err));
   };
 
   const fetchUsuarios = () => {
-    fetch('https://127.0.0.1:8000/api/usuarios/ver')
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/usuario/ver')
       .then(res => res.json())
       .then(data => setUsuarios(data))
       .catch(err => console.error('Error al cargar usuarios:', err));
   };
 
   const agregarProducto = () => {
-    fetch('https://127.0.0.1:8000/api/productos/create', {
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -83,7 +83,7 @@ const Admin: React.FC = () => {
   };
 
   const editarProducto = (id: number, nombre: string, precio: number, descripcion: string, marca: string, categoria: number, foto: string, stock: number) => {
-    fetch(`https://127.0.0.1:8000/api/productos/update/${id}`, {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/productos/update/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, precio, descripcion, marca, categoria, foto, stock }),
@@ -91,19 +91,19 @@ const Admin: React.FC = () => {
   };
 
   const eliminarProducto = (id: number) => {
-    fetch(`https://127.0.0.1:8000/api/productos/delete/${id}`, {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/productos/delete/${id}`, {
       method: 'DELETE',
     }).then(() => fetchProductos());
   };
 
   const agregarUsuario = () => {
-    fetch('https://127.0.0.1:8000/api/usuario/crear', {
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/usuario/crear', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nombre: nombreUsuario,
         email: emailUsuario,
-        rol: rolUsuario,
+        roles: rolUsuario,
         direccion: direccion,
         codigo_postal : codigo_postal
         
@@ -118,20 +118,19 @@ const Admin: React.FC = () => {
     });
   };
 
-  const editarUsuario = (id: number, nombre: string, email: string, rol: string, direccion:string, codigo_postal:number) => {
-    fetch(`https://127.0.0.1:8000/api/usuario/editar/${id}`, {
+  const editarUsuario = (id: number, nombre: string, email: string, roles: Array<string>, direccion:string, codigo_postal:number) => {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/usuario/editar/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, rol, direccion, codigo_postal }),
+      body: JSON.stringify({ nombre, email, roles, direccion, codigo_postal }),
     }).then(() => fetchUsuarios());
   };
 
   const eliminarUsuario = (id: number) => {
-    fetch(`https://127.0.0.1:8000/api/usuario/eliminar/${id}`, {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/usuario/eliminar/${id}`, {
       method: 'DELETE',
     }).then(() => fetchUsuarios());
   };
-
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Administrador de Productos</h1>
@@ -180,11 +179,11 @@ const Admin: React.FC = () => {
       <ul>
         {usuarios.map(user => (
           <li key={user.id}>
-            <input defaultValue={user.nombre} onBlur={e => editarUsuario(user.id, e.target.value, user.email, user.rol, user.direccion, user.codigo_postal)} />
-            <input defaultValue={user.email} onBlur={e => editarUsuario(user.id, user.nombre, e.target.value, user.rol, user.direccion, user.codigo_postal)} />
-            <input defaultValue={user.rol} onBlur={e => editarUsuario(user.id, user.nombre, user.email, e.target.value, user.direccion, user.codigo_postal)} />
-            <input defaultValue={user.direccion} onBlur={e => editarUsuario(user.id, user.nombre, user.email, user.rol, e.target.value, user.codigo_postal)} />
-            <input defaultValue={user.rol} onBlur={e => editarUsuario(user.id, user.nombre, user.email, user.rol, user.direccion, Number(e.target.value))} />
+            <input defaultValue={user.nombre} onBlur={e => editarUsuario(user.id, e.target.value, user.email, user.roles, user.direccion, user.codigo_postal)} />
+            <input defaultValue={user.email} onBlur={e => editarUsuario(user.id, user.nombre, e.target.value, user.roles, user.direccion, user.codigo_postal)} />
+            <input defaultValue={user.roles} onBlur={e => editarUsuario(user.id, user.nombre, user.email, Array(e.target.value), user.direccion, user.codigo_postal)} />
+            <input defaultValue={user.direccion} onBlur={e => editarUsuario(user.id, user.nombre, user.email, user.roles, e.target.value, user.codigo_postal)} />
+            <input defaultValue={user.codigo_postal} onBlur={e => editarUsuario(user.id, user.nombre, user.email, user.roles, user.direccion, Number(e.target.value))} />
             <button onClick={() => eliminarUsuario(user.id)}>Eliminar</button>
           </li>
         ))}

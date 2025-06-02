@@ -21,7 +21,7 @@ function Carrito() {
                 }
                 // eslint-disable-next-line prefer-const
                 let id = getCookieValue("id")
-                const res = await fetch("https://127.0.0.1:8000/api/pedido/verCarrito", {
+                const res = await fetch("https://tienda-ropa-backend-xku2.onrender.com/api/pedido/verCarrito", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
