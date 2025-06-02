@@ -1,11 +1,19 @@
 import NavScroll from "../components/NavScroll.tsx";
 import Carrusel from "../components/Carrusel.tsx";
 import ProductCards, { Product } from "../components/Productos.tsx";
+<<<<<<< HEAD
 import { BodyText } from "react-bootstrap-icons";
 
 
 function Inicio() {
     const handleAddToCart = async (product: Product) => {
+=======
+import { useState } from "react";
+
+function Inicio() {
+    const [search, setSearch] = useState('');
+    const handleAddToCart = (product: Product) => {
+>>>>>>> a97702b869404d27b0fb003dec779fd3ccf5727c
         // Lógica para añadir producto al carrito
        
 
@@ -61,12 +69,17 @@ function Inicio() {
     };
     return (
         <div style={{ paddingTop: '100px' }}>
+<<<<<<< HEAD
             <h1>INICIO</h1>
             <NavScroll />
+=======
+            <NavScroll onSearchChange={setSearch}/>
+>>>>>>> a97702b869404d27b0fb003dec779fd3ccf5727c
             <Carrusel />
             <ProductCards
                 url="http://127.0.0.1:8000/api/productos/ver"
                 onAddToCart={handleAddToCart}
+                search={search}
             />
 
         </div>

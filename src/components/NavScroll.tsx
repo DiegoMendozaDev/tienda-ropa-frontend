@@ -14,39 +14,37 @@ interface Category {
   nombre: string;
   subcategorias?: Category[];
 }
-
+interface NavScrollProps {
+  onSearchChange: (value: string) => void;
+}
 // Datos de ejemplo
 const categorias: Category[] = [
-  {
-    id: '1',
-    nombre: 'Regalos y Personalización',
-    subcategorias: [
-      { id: '1-1', nombre: 'Regalos para ella' },
-      { id: '1-2', nombre: 'Regalos para él' },
-      { id: '1-3', nombre: 'Regalos para parejas' },
-      { id: '1-4', nombre: 'Regalos para bebés' },
-      { id: '1-5', nombre: 'Regalos para mascotas' },
-      { id: '1-6', nombre: 'Regalos Louis Vuitton' },
-      { id: '1-7', nombre: 'Personalización' },
+  { 
+    id: '1', 
+    nombre: 'Mujer', 
+    subcategorias:[
+      { id: "1-1", nombre: "bolso"},
+      { id: "1-2", nombre: "vestido"}
     ]
   },
-  { id: '2', nombre: 'Novedades' },
-  { id: '3', nombre: 'Bolsos y pequeña marroquinería' },
-  { id: '4', nombre: 'Mujer' },
-  { id: '5', nombre: 'Hombre' },
-  { id: '6', nombre: 'Joyería' },
-  { id: '7', nombre: 'Relojería' },
-  { id: '8', nombre: 'Perfumes' },
-  { id: '9', nombre: 'Baúles, Viaje y Hogar' },
-  { id: '10', nombre: 'Servicios' },
+  { 
+    id: '2', 
+    nombre: 'Hombre', 
+    subcategorias:[
+      { id: "2-1", nombre:"camisa"},
+      { id: "2-2", nombre:"pantalon"}
+    ]
+  },
+
 ];
 
-function NavScroll() {
+function NavScroll({ onSearchChange }: NavScrollProps) {
   // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [show, setShow] = useState(false);
   const [selectedCat, setSelectedCat] = useState<Category | null>(null);
+  const [searchText, setSearchText] = useState('');
 
   const isLoggedIn = Boolean(cookies.user);
 
@@ -59,7 +57,11 @@ function NavScroll() {
     removeCookie('user', { path: '/' });
     window.location.reload();
   };
-
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+    onSearchChange(value);
+  };
   return (
     <Navbar fixed="top" expand="sm" className="bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
       <Container fluid>
@@ -75,18 +77,19 @@ function NavScroll() {
               <Form className="d-flex w-100 justify-content-center">
                 <Form.Control
                   type="search"
-                  placeholder="Search"
+                  placeholder="Buscar productos"
                   className="me-2"
                   style={{ maxWidth: '300px' }}
+                  value={searchText}
+                  onChange={onSearch}
                 />
-                <Button variant="outline-success">Search</Button>
               </Form>
             </Nav>
           </div>
 
           {/* Marca centrada */}
           <Navbar.Brand href="#" className="mx-auto" style={{ padding: '1rem' }}>
-            Navbar scroll
+            StyleOnLine
           </Navbar.Brand>
 
           {/* Iconos y botones de usuario */}

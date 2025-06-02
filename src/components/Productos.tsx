@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Card, Button, Row, Col, Container, Spinner } from 'react-bootstrap';
 import { getFormData } from '../services/GetService';
 
@@ -18,44 +18,60 @@ export interface Product {
 interface ProductCardsProps {
     url: string;
     onAddToCart?: (product: Product) => void;
+    search?: string;
 }
 
-function ProductCards({ url, onAddToCart }: ProductCardsProps) {
-    const [productos, setProductos] = useState<Product[] | null>(null);
+function ProductCards({ url, onAddToCart, search = '' }: ProductCardsProps) {
+    const [productos, setProductos] = useState<Product[]>([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const observer = useRef<IntersectionObserver | null>(null);
+    const loader = useRef<HTMLDivElement | null>(null);
+
+    const fetchProductos = useCallback(() => {
+        setLoading(true);
+        getFormData<Record<string, never>, Product[]>(`${url}?page=${page}`, {})
+            .then(data => {
+                if (data.length === 0) {
+                    setHasMore(false);
+                } else {
+                    setProductos(prev => [...prev, ...data]);
+                }
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, [url, page]);
 
     useEffect(() => {
-        // Llama a la API para obtener los productos desde la URL pasada
-        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-        getFormData<{}, Product[]>(
-            url,
-            {}
-        )
-            .then(data => setProductos(data))
-            .catch(err => setError(err.message));
-    }, [url]);
+        fetchProductos();
+    }, [fetchProductos]);
 
-    if (error) {
-        return <div className="text-danger">Error cargando productos: {error}</div>;
-    }
+    useEffect(() => {
+        if (loading || !hasMore) return;
+        if (observer.current) observer.current.disconnect();
 
-    if (productos === null) {
-        return (
-            <div className="d-flex justify-content-center py-5">
-                <Spinner animation="border" role="status" aria-hidden="true" />
-                <span className="visually-hidden">Cargando productos...</span>
-            </div>
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                setPage(prev => prev + 1);
+            }
+        });
+
+        if (loader.current) observer.current.observe(loader.current);
+    }, [loading, hasMore]);
+    const productosFiltrados = useMemo(() => {
+        return productos.filter(p =>
+            p.nombre.toLowerCase().includes(search.toLowerCase())
         );
-    }
-
-    if (productos.length === 0) {
-        return <div>No hay productos disponibles.</div>;
-    }
-
+    }, [search, productos]);
     return (
         <Container className="py-4">
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-                {productos.map(producto => (
+                {productosFiltrados.map(producto => (
                     <Col key={producto.id}>
                         <Card className="h-100">
                             <Card.Img
@@ -71,20 +87,28 @@ function ProductCards({ url, onAddToCart }: ProductCardsProps) {
                                 </Card.Text>
                                 <div className="d-flex justify-content-between align-items-center">
                                     <h5 className="mb-0">€{producto.precio.toFixed(2)}</h5>
-                                    {onAddToCart ? (
+                                    {onAddToCart && (
                                         <Button
                                             variant="primary"
                                             onClick={() => onAddToCart(producto)}
                                         >
                                             Añadir al carrito
                                         </Button>
-                                    ) : null}
+                                    )}
                                 </div>
                             </Card.Body>
                         </Card>
                     </Col>
                 ))}
             </Row>
+            {loading && (
+                <div className="text-center py-4">
+                    <Spinner animation="border" role="status" />
+                </div>
+            )}
+            <div ref={loader} />
+            {error && <div className="text-danger">Error cargando productos: {error}</div>}
+            {!hasMore && <div className="text-center py-4">No hay más productos.</div>}
         </Container>
     );
 }
