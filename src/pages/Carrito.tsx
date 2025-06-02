@@ -19,8 +19,9 @@ function Carrito() {
                     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
                     return match ? decodeURIComponent(match[2]) : null;
                 }
+                // eslint-disable-next-line prefer-const
                 let id = getCookieValue("id")
-                const res = await fetch("http://127.0.0.1:8000/api/pedido/verCarrito", {
+                const res = await fetch("https://127.0.0.1:8000/api/pedido/verCarrito", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -33,9 +34,8 @@ function Carrito() {
                 });;
                 const data = await res.json();
                 console.log("Data completa:", data);
-
                 const item = data;
-               
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const productosProcesados: Producto[] = item.detalles.map((detalle: any) => ({
                     id: item.id_pedido,
                     nombre: detalle.nombre,

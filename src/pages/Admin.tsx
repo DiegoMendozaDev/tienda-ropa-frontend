@@ -44,21 +44,21 @@ const Admin: React.FC = () => {
   }, []);
 
   const fetchProductos = () => {
-    fetch('http://127.0.0.1:8000/api/productos/ver')
+    fetch('httpss://127.0.0.1:8000/api/productos/ver')
       .then(res => res.json())
       .then(data => setProductos(data))
       .catch(err => console.error('Error al cargar productos:', err));
   };
 
   const fetchUsuarios = () => {
-    fetch('http://127.0.0.1:8000/api/usuarios/ver')
+    fetch('https://127.0.0.1:8000/api/usuarios/ver')
       .then(res => res.json())
       .then(data => setUsuarios(data))
       .catch(err => console.error('Error al cargar usuarios:', err));
   };
 
   const agregarProducto = () => {
-    fetch('http://127.0.0.1:8000/api/productos/create', {
+    fetch('https://127.0.0.1:8000/api/productos/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -83,7 +83,7 @@ const Admin: React.FC = () => {
   };
 
   const editarProducto = (id: number, nombre: string, precio: number, descripcion: string, marca: string, categoria: number, foto: string, stock: number) => {
-    fetch(`http://127.0.0.1:8000/api/productos/update/${id}`, {
+    fetch(`https://127.0.0.1:8000/api/productos/update/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, precio, descripcion, marca, categoria, foto, stock }),
@@ -91,13 +91,13 @@ const Admin: React.FC = () => {
   };
 
   const eliminarProducto = (id: number) => {
-    fetch(`http://127.0.0.1:8000/api/productos/delete/${id}`, {
+    fetch(`https://127.0.0.1:8000/api/productos/delete/${id}`, {
       method: 'DELETE',
     }).then(() => fetchProductos());
   };
 
   const agregarUsuario = () => {
-    fetch('http://127.0.0.1:8000/api/usuario/crear', {
+    fetch('https://127.0.0.1:8000/api/usuario/crear', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -119,7 +119,7 @@ const Admin: React.FC = () => {
   };
 
   const editarUsuario = (id: number, nombre: string, email: string, rol: string, direccion:string, codigo_postal:number) => {
-    fetch(`http://127.0.0.1:8000/api/usuario/editar/${id}`, {
+    fetch(`https://127.0.0.1:8000/api/usuario/editar/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre, email, rol, direccion, codigo_postal }),
@@ -127,7 +127,7 @@ const Admin: React.FC = () => {
   };
 
   const eliminarUsuario = (id: number) => {
-    fetch(`http://127.0.0.1:8000/api/usuario/eliminar/${id}`, {
+    fetch(`https://127.0.0.1:8000/api/usuario/eliminar/${id}`, {
       method: 'DELETE',
     }).then(() => fetchUsuarios());
   };

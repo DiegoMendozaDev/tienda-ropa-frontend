@@ -48,7 +48,7 @@ function FormLogin() {
 
     try {
       const result = await postFormData<FormValues, ApiResponse>(
-        'http://127.0.0.1:8000/api/usuario/comprobar_usuario',
+        'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
         values
       );
       setResponseData(result);
@@ -70,8 +70,9 @@ function FormLogin() {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? decodeURIComponent(match[2]) : null;
       }
+      // eslint-disable-next-line prefer-const
       let value = getCookieValue("user")
-      fetch('http://127.0.0.1:8000/api/usuario/ver_usuario', {
+      fetch('https://127.0.0.1:8000/api/usuario/ver_usuario', {
         method: 'POST',
         body: JSON.stringify({
           email: value
