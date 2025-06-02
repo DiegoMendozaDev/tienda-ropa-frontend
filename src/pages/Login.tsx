@@ -45,9 +45,10 @@ function FormLogin() {
   ) => {
     setError(null);
     setIsLoading(true);
+
     try {
       const result = await postFormData<FormValues, ApiResponse>(
-        'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
+        'http://127.0.0.1:8000/api/usuario/comprobar_usuario',
         values
       );
       setResponseData(result);
@@ -61,6 +62,34 @@ function FormLogin() {
         const errorObj = JSON.parse(err.message);
         setError(errorObj.error || 'Error desconocido');
       }
+    } finally {
+      setIsLoading(false);
+      setSubmitting(false);
+    } try {
+      function getCookieValue(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+      }
+      let value = getCookieValue("user")
+      fetch('http://127.0.0.1:8000/api/usuario/ver_usuario', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: value
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json()) // conviertes a JSON aquí
+        .then(data => {
+          // Ahora sí puedes acceder a data.id
+          document.cookie = `id=${encodeURIComponent(data.id)}; path=/; max-age=3600`;
+          console.log('Usuario:', data);
+        })
+
+
+    } catch (err) {
+      console.error(err)
     } finally {
       setIsLoading(false);
       setSubmitting(false);
