@@ -12,7 +12,7 @@ function Categoria() {
     const [error, setError] = useState<string | null>(null)
 
     // Construimos la URL del endpoint
-    const url = `https://127.0.0.1:8000/api/productos/categoria/${id}`
+    const url = `https://tienda-ropa-backend-xku2.onrender.com/api/productos/categoria/${id}`
 
     useEffect(() => {
         async function fetchCategoria() {

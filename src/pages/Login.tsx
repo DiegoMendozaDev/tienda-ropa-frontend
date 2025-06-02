@@ -48,7 +48,7 @@ function FormLogin() {
 
     try {
       const result = await postFormData<FormValues, ApiResponse>(
-        'https://127.0.0.1:8000/api/usuario/comprobar_usuario',
+        'https://tienda-ropa-backend-xku2.onrender.com/api/usuario/comprobar_usuario',
         values
       );
       setResponseData(result);
@@ -72,7 +72,7 @@ function FormLogin() {
       }
       // eslint-disable-next-line prefer-const
       let value = getCookieValue("user")
-      fetch('https://127.0.0.1:8000/api/usuario/ver_usuario', {
+      fetch('https://tienda-ropa-backend-xku2.onrender.com/api/usuario/ver_usuario', {
         method: 'POST',
         body: JSON.stringify({
           email: value

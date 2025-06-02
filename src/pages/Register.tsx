@@ -64,7 +64,7 @@ function FormRegister() {
     setIsLoading(true);
     try {
       const result = await postFormData<FormValues, ApiResponse>(
-        'https://127.0.0.1:8000/api/usuario/crear',
+        'https://tienda-ropa-backend-xku2.onrender.com/api/usuario/crear',
         values
       );
       setResponseData(result);

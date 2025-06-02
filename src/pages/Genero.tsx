@@ -13,7 +13,7 @@ function Genero() {
     };
 
     // Monta la URL según el género seleccionado
-    const url = `https://127.0.0.1:8000/api/productos/genero/${genero}`;
+    const url = `https://tienda-ropa-backend-xku2.onrender.com/api/productos/genero/${genero}`;
 
     return (
         <div style={{ paddingTop: '100px' }}>
