@@ -109,7 +109,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
             {isLoggedIn ? (
               <div className="d-flex align-items-center gap-2">
                 <Nav.Link href="/profile"><Person size={26} /></Nav.Link>
-                <Nav.Link href="/cart"><Bag size={26} /></Nav.Link>
+                <Nav.Link href="/carrito"><Bag size={26} /></Nav.Link>
                 <Nav.Link href="/favorites"><Heart size={26} /></Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>
               </div>

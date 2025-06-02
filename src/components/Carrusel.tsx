@@ -16,7 +16,7 @@ function Carrusel() {
   useEffect(() => {
     // Llama a la API; aquí ejemplo con sin parámetros
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    getFormData<{}, Slide[]>("https://127.0.0.1:8000/api/productos/masVendidos", {})
+    getFormData<{}, Slide[]>("http://127.0.0.1:8000/api/productos/masVendidos", {})
       .then((data) => setSlides(data))
       .catch((err) => setError(err.message));
   }, []);
