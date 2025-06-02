@@ -1,0 +1,87 @@
+// src/pages/Categoria.tsx
+import { useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import NavScroll from '../components/NavScroll'
+import ProductCards, { Product } from '../components/Productos'
+
+function Categoria() {
+    const { id } = useParams<{ id: string }>()
+    const [search, setSearch] = useState('')
+    const [nombreCategoria, setNombreCategoria] = useState<string | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    // Construimos la URL del endpoint
+    const url = `https://127.0.0.1:8000/api/productos/categoria/${id}`
+
+    useEffect(() => {
+        async function fetchCategoria() {
+            setLoading(true)
+            setError(null)
+            try {
+                const resp = await fetch(url)
+                if (!resp.ok) {
+                    throw new Error(`Error ${resp.status}`)
+                }
+                const data = (await resp.json()) as Array<Product & { categoria: string }>
+
+                if (Array.isArray(data) && data.length > 0) {
+                    // Tomamos el campo "categoria" del primer producto
+                    setNombreCategoria(data[0].categoria)
+                } else {
+                    // Si el array está vacío
+                    setNombreCategoria('Sin productos')
+                }
+            } catch (err) {
+                setError('No se pudo cargar la categoría '+ err)
+                setNombreCategoria(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchCategoria()
+    }, [url])
+
+    const handleAddToCart = (product: Product) => {
+        alert(`Has añadido ${product.nombre} al carrito.`)
+    }
+
+    return (
+        <div style={{ paddingTop: '100px' }}>
+            <NavScroll onSearchChange={setSearch} />
+
+            {/* Mostrar spinner o mensaje de error mientras carga */}
+            {loading && (
+                <div className="text-center my-4">
+                    <span>Cargando categoría…</span>
+                </div>
+            )}
+            {error && (
+                <div className="text-center my-4 text-danger">
+                    {error}
+                </div>
+            )}
+
+            {/* Sólo mostramos el título una vez que haya terminado de cargar */}
+            {!loading && !error && (
+                <h2 className="text-center my-4">
+                    {nombreCategoria
+                        ? `Categoría: ${nombreCategoria}`
+                        : `Categoría ${id}`}
+                </h2>
+            )}
+
+            {/* Una vez cargado, renderizamos ProductCards paseándole la misma URL */}
+            {!loading && !error && (
+                <ProductCards
+                    url={url}
+                    onAddToCart={handleAddToCart}
+                    search={search}
+                />
+            )}
+        </div>
+    )
+}
+
+export default Categoria

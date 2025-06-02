@@ -7,12 +7,14 @@ import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Bag, Heart, List, Person, X, ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
 // Tipo para categorías
 interface Category {
   id: string;
   nombre: string;
   subcategorias?: Category[];
+  slug?: string;
 }
 interface NavScrollProps {
   onSearchChange: (value: string) => void;
@@ -20,25 +22,35 @@ interface NavScrollProps {
 // Datos de ejemplo
 const categorias: Category[] = [
   { 
+    id: '100', 
+    nombre: 'Chico',
+    slug: "chico",
+  },
+  { 
+    id: '200', 
+    nombre: 'Chica', 
+    slug: 'chica'
+  },
+  { 
     id: '1', 
-    nombre: 'Mujer', 
-    subcategorias:[
-      { id: "1-1", nombre: "bolso"},
-      { id: "1-2", nombre: "vestido"}
-    ]
+    nombre: 'bolso', 
   },
   { 
     id: '2', 
-    nombre: 'Hombre', 
-    subcategorias:[
-      { id: "2-1", nombre:"camisa"},
-      { id: "2-2", nombre:"pantalon"}
-    ]
+    nombre: 'camisa', 
   },
-
+  { 
+    id: '3', 
+    nombre: 'vestido', 
+  },
+  { 
+    id: '4', 
+    nombre: 'pantalón', 
+  },
 ];
 
 function NavScroll({ onSearchChange }: NavScrollProps) {
+  const navigate = useNavigate();
   // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
@@ -88,7 +100,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
           </div>
 
           {/* Marca centrada */}
-          <Navbar.Brand href="#" className="mx-auto" style={{ padding: '1rem' }}>
+          <Navbar.Brand href="/" className="mx-auto" style={{ padding: '1rem' }}>
             StyleOnLine
           </Navbar.Brand>
 
@@ -139,7 +151,21 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
                 {categorias.map(cat => (
                   <div
                     key={cat.id}
-                    onClick={() => cat.subcategorias ? setSelectedCat(cat) : window.location.href = `/categoria/${cat.id}`}
+                    onClick={() => {
+                      if (cat.subcategorias) {
+                        setSelectedCat(cat);
+                      } else {
+                        // FORZAMOS recarga completa en lugar de navigate()
+                        if (cat.slug === 'chico') {
+                          window.location.href = '/tienda/chico';
+                        } else if (cat.slug === 'chica') {
+                          window.location.href = '/tienda/chica';
+                        } else {
+                          window.location.href = `/categoria/${cat.id}`;
+                        }
+                        handleClose();
+                      }
+                    }}
                     className="p-3 d-flex justify-content-between align-items-center"
                     style={{ cursor: 'pointer', background: selectedCat?.id === cat.id ? '#f8f9fa' : undefined }}
                   >
@@ -162,7 +188,13 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
                   {selectedCat.subcategorias?.map(sub => (
                     <div
                       key={sub.id}
-                      onClick={() => window.location.href = `/categoria/${sub.id}`}
+                      onClick={() => {
+                        if (sub.slug === 'chico') {
+                          navigate('/tienda/chico');
+                        } else {
+                          navigate(`/tienda/${sub.id}`);
+                        }
+                    }}
                       className="p-3"
                       style={{ cursor: 'pointer' }}
                     >
