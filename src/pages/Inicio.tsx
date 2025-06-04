@@ -14,7 +14,7 @@ function Inicio() {
                 return match ? decodeURIComponent(match[2]) : null;
             }
             // eslint-disable-next-line prefer-const
-            let id = getCookieValue("id")
+            let id = getCookieValue("id_usuario")
             fetch('https://tienda-ropa-backend-xku2.onrender.com/api/pedido/create', {
                 method: 'POST',
                 body: JSON.stringify({

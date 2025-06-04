@@ -5,7 +5,7 @@ type Producto = {
     nombre: string;
     precio: number;
     cantidad: number;
-    imagen: string;
+    foto: string;
 };
 
 function Carrito() {
@@ -20,33 +20,39 @@ function Carrito() {
                     return match ? decodeURIComponent(match[2]) : null;
                 }
                 // eslint-disable-next-line prefer-const
-                let id = getCookieValue("id")
+                let idUsuario = getCookieValue("id_usuario")
+                if (!idUsuario) {
+                    console.error('No se encontró la cookie "id_usuario"')
+                    setCargando(false)
+                    return
+                }
                 const res = await fetch("https://tienda-ropa-backend-xku2.onrender.com/api/pedido/verCarrito", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        "id_usuario": id,
+                        "id_usuario": idUsuario,
                         "estado": "preparando"
 
                     }),
-                });;
+                })
+                if (!res.ok) {
+                    console.error('Error en la petición:', res.status, res.statusText)
+                    setCargando(false)
+                    return
+                }
                 const data = await res.json();
                 console.log("Data completa:", data);
-                const item = data;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const productosProcesados: Producto[] = item.detalles.map((detalle: any) => ({
-                    id: item.id_pedido,
+                const productosProcesados: Producto[] = data.detalles.map((detalle: any) => ({
+                    id: detalle.id_detalle,
                     nombre: detalle.nombre,
                     precio: detalle.precio ?? 0,
                     cantidad: detalle.cantidad ?? 1,
-                    imagen: ""
-                }));
-
+                    foto: detalle.foto
+                }))
                 console.log("Productos procesados:", productosProcesados);
-
-
                 setProductos(productosProcesados);
             } catch (error) {
                 console.error("Error al obtener el carrito:", error);
@@ -66,10 +72,25 @@ function Carrito() {
         );
     };
 
-    const eliminarProducto = (id: number) => {
-        setProductos(prev => prev.filter(p => p.id !== id));
-    };
-    console.log("Productos:" + productos)
+    // Envía DELETE a la API y, si funciona, lo quita del estado
+    const eliminarProducto = async (idDetalle: number) => {
+        try {
+            const res = await fetch(
+                `https://tienda-ropa-backend-xku2.onrender.com/api/detalle/delete/${idDetalle}`,
+                {
+                    method: 'DELETE'
+                }
+            )
+            if (!res.ok) {
+                console.error('Error al eliminar detalle:', res.status, res.statusText)
+                return
+            }
+            // Si la respuesta es correcta, lo quitamos del estado local
+            setProductos(prev => prev.filter(p => p.id !== idDetalle))
+        } catch (error) {
+            console.error('Error en la petición DELETE:', error)
+        }
+    }
     const total = productos.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
 
     if (cargando) {
@@ -91,9 +112,10 @@ function Carrito() {
                                 className="flex items-center justify-between gap-4 border-b pb-4"
                             >
                                 <img
-                                    src={producto.imagen}
+                                    src={producto.foto}
                                     alt={producto.nombre}
-                                    className="w-20 h-20 object-cover rounded border"
+                                    className="rounded border img-fluid"
+                                    style={{ maxWidth: '256px', maxHeight: '256px', objectFit: 'cover' }}
                                 />
                                 <div className="flex-1">
                                     <h2 className="text-lg font-semibold">{producto.nombre}</h2>
