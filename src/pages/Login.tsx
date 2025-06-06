@@ -15,7 +15,6 @@ import { useCookies } from 'react-cookie';
 interface FormValues {
   email: string;
   contrasena: string;
-  rememberMe: boolean;
 }
 interface ApiResponse {
   message: string;
@@ -27,7 +26,6 @@ const validationSchema = yup.object().shape({
 const initialValues: FormValues = {
   email: '',
   contrasena: '',
-  rememberMe: false,
 };
 function FormLogin() {
   const navigate = useNavigate();
@@ -146,15 +144,6 @@ function FormLogin() {
                   </InputGroup>
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formRememberMe">
-                  <Form.Check
-                    type="checkbox"
-                    name="rememberMe"
-                    label="Recuérdame"
-                    checked={values.rememberMe}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
 
                 {isSubmitting || isLoading ? (
                   <Spinner animation="grow" size="sm" />
