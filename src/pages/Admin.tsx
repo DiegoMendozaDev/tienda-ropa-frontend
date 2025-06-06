@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Genero from './Genero';
 
 interface Producto {
   id: number,
