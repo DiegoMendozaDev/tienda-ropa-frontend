@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 type Producto = {
     id: number;
     nombre: string;
+    id_producto: number;
     precio: number;
     cantidad: number;
     foto: string;
@@ -48,6 +49,7 @@ function Carrito() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const productosProcesados: Producto[] = data.detalles.map((detalle: any) => ({
                     id: detalle.id_detalle,
+                    id_producto: detalle.id_producto,
                     nombre: detalle.nombre,
                     precio: detalle.precio ?? 0,
                     cantidad: detalle.cantidad ?? 1,
@@ -64,6 +66,38 @@ function Carrito() {
 
         obtenerProductos();
     }, []);
+    /** Llama al endpoint PUT para actualizar un detalle en la BBDD */
+    async function actualizarDetalleEnServidor(
+        id_detalle: number,
+        id_producto: number,
+        cantidad: number,
+        precio_unitario: number
+    ) {
+        try {
+            const res = await fetch(
+                `https://tienda-ropa-backend-xku2.onrender.com/api/detalle/update/${id_detalle}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_producto: id_producto,
+                        cantidad: cantidad,
+                        precio_unitario: precio_unitario
+                    })
+                }
+            );
+            if (!res.ok) {
+                console.error(
+                    'Error al actualizar detalle en servidor:',
+                    res.status,
+                    res.statusText
+                );
+            }
+            // Si deseas procesar la respuesta, haz `await res.json()` aquí
+        } catch (error) {
+            console.error('Error en fetch PUT:', error);
+        }
+    }
 
     const actualizarCantidad = (id: number, nuevaCantidad: number) => {
         setProductos(prev =>
@@ -129,8 +163,17 @@ function Carrito() {
                                                 type="number"
                                                 min="1"
                                                 value={producto.cantidad}
-                                                onChange={e =>
-                                                    actualizarCantidad(producto.id, parseInt(e.target.value))
+                                                onChange={e =>{
+                                                    const nuevaCant = Math.max(1, parseInt(e.target.value) || 1);
+                                                    actualizarCantidad(producto.id, nuevaCant)
+                                                    
+                                                    actualizarDetalleEnServidor(
+                                                        producto.id,
+                                                        producto.id_producto,
+                                                        nuevaCant,
+                                                        producto.precio
+                                                    );
+                                                }
                                                 }
                                                 className="ml-2 w-16 border rounded px-2 py-1"
                                             />
