@@ -171,6 +171,7 @@ const Admin: React.FC = () => {
     }).then(() => fetchUsuarios());
   };
   return (
+    <>
     <div style={{ padding: '2rem' }}>
       <h1>Administrador de Productos</h1>
 
@@ -237,6 +238,20 @@ const Admin: React.FC = () => {
         ))}
       </ul>
     </div>
+<button
+      onClick={() => window.location.href = "/"}
+      style={{
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
+        padding: "8px 16px",
+        borderRadius: "6px",
+        cursor: "pointer"
+      }}
+    >
+      ← Volver atrás
+    </button>
+</>
   );
 };
 

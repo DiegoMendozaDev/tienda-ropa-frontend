@@ -99,6 +99,7 @@ function Carrito() {
     }
 
     return (
+        <>
         <div className="max-w-3xl mx-auto p-4 bg-white shadow rounded">
             <h1 className="text-3xl font-bold mb-6 text-center">🛒 Carrito de Compras</h1>
 
@@ -173,7 +174,23 @@ function Carrito() {
                     </div>
                 </div>
             )}
+            <br></br>
+             <button
+      onClick={() => window.location.href = "/"}
+      style={{
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
+        padding: "8px 16px",
+        borderRadius: "6px",
+        cursor: "pointer"
+      }}
+    >
+      ← Volver atrás
+    </button>
         </div>
+       
+    </>
     );
 }
 

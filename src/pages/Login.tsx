@@ -85,6 +85,7 @@ function FormLogin() {
         .then(data => {
           // Ahora sí puedes acceder a data.id
           document.cookie = `id_usuario=${encodeURIComponent(data.id)}; path=/; max-age=3600`;
+          document.cookie = `rol=${encodeURIComponent(data.rol)}; path=/; max-age=3600`;
           console.log('Usuario:', data);
         })
 
