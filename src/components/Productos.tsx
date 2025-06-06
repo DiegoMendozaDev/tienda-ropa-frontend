@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Card, Button, Row, Col, Container, Spinner } from 'react-bootstrap';
 import { getFormData } from '../services/GetService';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
 // Define la interfaz que la API devuelve para cada producto
 export interface Product {
@@ -29,6 +31,10 @@ function ProductCards({ url, onAddToCart, search = '' }: ProductCardsProps) {
     const [error, setError] = useState<string | null>(null);
     const observer = useRef<IntersectionObserver | null>(null);
     const loader = useRef<HTMLDivElement | null>(null);
+
+    // Leer cookies para saber si está logueado
+    const [cookies] = useCookies(['user']);
+    const navigate = useNavigate();
 
     const fetchProductos = useCallback(() => {
         setLoading(true);
@@ -63,11 +69,13 @@ function ProductCards({ url, onAddToCart, search = '' }: ProductCardsProps) {
 
         if (loader.current) observer.current.observe(loader.current);
     }, [loading, hasMore]);
+
     const productosFiltrados = useMemo(() => {
         return productos.filter(p =>
             p.nombre.toLowerCase().includes(search.toLowerCase())
         );
     }, [search, productos]);
+
     return (
         <Container className="py-4">
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
@@ -90,7 +98,15 @@ function ProductCards({ url, onAddToCart, search = '' }: ProductCardsProps) {
                                     {onAddToCart && (
                                         <Button
                                             variant="primary"
-                                            onClick={() => onAddToCart(producto)}
+                                            onClick={() => {
+                                                // Si no hay cookie "user", redirige a login
+                                                if (!cookies.user) {
+                                                    navigate('/login');
+                                                } else {
+                                                    // Si está logueado, llama a la función
+                                                    onAddToCart(producto);
+                                                }
+                                            }}
                                         >
                                             Añadir al carrito
                                         </Button>
