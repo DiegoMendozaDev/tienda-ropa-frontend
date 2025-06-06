@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 
 type Producto = {
     id: number;
@@ -189,6 +190,29 @@ function Carrito() {
                     </ul>
                     <div className="mt-6 text-right">
                         <h3 className="text-2xl font-bold">Total: €{total.toFixed(2)}</h3>
+                        {document.cookie = `total=${encodeURIComponent(total.toFixed(2))}; path=/; max-age=3600}`}
+                    </div>
+                    <div>
+                        <Link to="/pagar">
+                            <button
+                                style={{
+                                    backgroundColor: '#0070f3',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '12px 24px',
+                                    fontSize: '16px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                                    transition: 'background-color 0.3s'
+                                }}
+                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0059c1')}
+                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0070f3')}
+                            >
+                                🛒 Pagar
+                            </button>
+                        </Link>
+
                     </div>
                 </div>
             )}

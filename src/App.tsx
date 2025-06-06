@@ -8,6 +8,8 @@ import Carrito from './pages/Carrito.tsx';
 import Admin from './pages/Admin.tsx';
 import Genero from './pages/Genero';
 import Categoria from './pages/Categoria.tsx';
+import PayPalButton from './pages/Pagar.tsx';
+
 function App() {
 
   return (
@@ -21,6 +23,7 @@ function App() {
         <Route path="register" element={ <Register /> } />
         <Route path="carrito" element= {<Carrito/>} />
         <Route path="admin" element = { < Admin />} />
+        <Route path="pagar" element={<PayPalButton/>}/>
       </Routes>
     </div>
   )
