@@ -48,7 +48,10 @@ const categorias: Category[] = [
     nombre: 'pantalón', 
   },
 ];
-
+function getCookieValue(name: string): string | null {
+                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                return match ? decodeURIComponent(match[2]) : null;
+  }
 function NavScroll({ onSearchChange }: NavScrollProps) {
   const navigate = useNavigate();
   // @ts-expect-error: esta variable se declara para un futuro uso
@@ -74,7 +77,23 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
     setSearchText(value);
     onSearchChange(value);
   };
+  
+   // Esto puede ser string o null
+  let rolCookie = getCookieValue("rol") ?? '[ROLE_USER]'; // si es null, usa '[]'
+  
+
+// Aquí aseguras que 'roldef' sea un array, aunque la cookie sea null o indefinida
+// let roldef: string[] = rolCookie ? JSON.parse(rolCookie) : [];
+//   if(rolCookie){
+//      const roles: string[] = JSON.parse(rolCookie);
+//      roldef = roles
+//   }
+  
+  
+ 
   return (
+  
+      
     <Navbar fixed="top" expand="sm" className="bg-body-tertiary mb-3" style={{ padding: '2rem 3rem' }}>
       <Container fluid>
         <div className="d-flex w-100 align-items-center">
@@ -112,6 +131,11 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
                 <Nav.Link href="/carrito"><Bag size={26} /></Nav.Link>
                 <Nav.Link href="/favorites"><Heart size={26} /></Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>
+                
+                {rolCookie.includes("admin") && (
+  <Button variant="outline-warning" href="/admin">Admin Panel</Button>
+)}
+
               </div>
             ) : (
               <div className="d-flex">
