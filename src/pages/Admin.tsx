@@ -24,6 +24,17 @@ interface Usuario {
   terms: boolean
 }
 
+interface Categoria {
+  id_categoria: number;
+  nombre: string;
+  
+};
+
+interface nuevaCategoria{
+  nombre: string, 
+  descripcion: string
+}
+
 const Admin: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -46,10 +57,24 @@ const Admin: React.FC = () => {
   const [codigo_postal, setCp] = useState('');
   const [Terms, setTerms] = useState<boolean>(false);
 
+  const [NombreCat, setNombreCat] = useState('')
+  const [DescCat, setDescCat] = useState('')
+ 
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
+
+  const [newCategoria, setNuevaCategoria] = useState<number>(0);
+  
+
+
   useEffect(() => {
     fetchProductos();
     fetchUsuarios();
+    
   }, []);
+
+  
+ 
 
   const fetchProductos = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/ver')
@@ -62,6 +87,12 @@ const Admin: React.FC = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/usuario/ver')
       .then(res => res.json())
       .then(data => setUsuarios(data))
+      .catch(err => console.error('Error al cargar usuarios:', err));
+  };
+  const fetchCat = (id:number) => {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver_categoria/${id}`)
+      .then(res => res.json())
+      .then(data => setCategorias(data))
       .catch(err => console.error('Error al cargar usuarios:', err));
   };
 
@@ -100,6 +131,25 @@ const Admin: React.FC = () => {
       setNuevoStock(0);
       setGenero('');
       fetchProductos();
+    }).catch(err => console.error(err));
+  };
+
+  const agregarCategoria = () => {
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/categoria/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: nuevoNombre,
+        descripcion: nuevadescripcion,
+
+      }),
+    }).then(() => {
+      console.log({
+        nombre: nuevoNombre,
+        descripcion: nuevadescripcion,
+        })
+      setNuevoNombre('');
+      setNuevaDesc('');
     }).catch(err => console.error(err));
   };
 
@@ -169,6 +219,25 @@ const Admin: React.FC = () => {
       method: 'DELETE',
     }).then(() => fetchUsuarios());
   };
+  
+const handleChange = (e: React.ChangeEvent<HTMLSelectElement>, prod: Producto) => {
+  const nuevoIdCat = Number(e.target.value);
+  setCategoriaSeleccionada(nuevoIdCat);
+
+  editarProducto(
+    prod.id,
+    prod.nombre,
+    prod.precio,
+    prod.descripcion,
+    prod.marca,
+    nuevoIdCat,
+    prod.foto,
+    prod.stock,
+    prod.genero
+  );
+
+  fetchCat(nuevoIdCat);
+};
   return (
     <>
     <div style={{ padding: '2rem' }}>
@@ -182,8 +251,17 @@ const Admin: React.FC = () => {
       Precio: <input type="number" placeholder="Precio..." value={nuevoPrecio} onChange={e => setNuevoPrecio(Number(e.target.value))} />
       <input type="text" placeholder="Marca..." value={nuevaMarca} onChange={e => setNuevaMarca(e.target.value)} />
       <br></br>
-      Categoria(id): <input type="number" placeholder="Categoría..." value={nuevaCategoria} onChange={e => setNuevaCat(Number(e.target.value))} />
-      <br></br>
+       <select
+    value={nuevaCategoria}
+    onChange={e => setNuevaCategoria(Number(e.target.value))}
+  >
+    <option value="" disabled>Selecciona una categoría</option>
+    {categorias.map(cat => (
+      <option key={cat.id_categoria} value={cat.id_categoria}>
+        {cat.nombre}
+      </option>
+    ))}
+  </select>
       Foto: <input type="file" placeholder="Foto..." value={nuevaFoto} onChange={e => setNuevaFoto(e.target.value)} />
       <br></br>
       stock: <input type="number" placeholder="Stock..." value={nuevoStock} onChange={e => setNuevoStock(Number(e.target.value))} />
@@ -193,20 +271,32 @@ const Admin: React.FC = () => {
       <h2>Lista de productos</h2>
       <ul>
         {productos.map(prod => (
-          <li key={prod.id}>
-            {/* Inputs de edición para productos */}
-            <input defaultValue={prod.nombre} onBlur={e => editarProducto(prod.id, e.target.value, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-            <input defaultValue={prod.precio} onBlur={e => editarProducto(prod.id, prod.nombre, Number(e.target.value), prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-            <input defaultValue={prod.descripcion} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, e.target.value, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-            <input defaultValue={prod.marca} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, e.target.value, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-            <input defaultValue={prod.id_categoria} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, Number(e.target.value), prod.foto, prod.stock,  prod.genero)} />
-            <input defaultValue={prod.foto} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, e.target.value, prod.stock,  prod.genero)} />
-            <input defaultValue={prod.stock} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, Number(e.target.value), prod.genero)} />
-            <input defaultValue={prod.genero} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, e.target.value)} />
-            <button onClick={() => eliminarProducto(prod.id)}>Eliminar</button>
-           
-          </li>
-        ))}
+  <li key={prod.id}>
+    <input defaultValue={prod.nombre} onBlur={e => editarProducto(prod.id, e.target.value, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
+    <input defaultValue={prod.precio} onBlur={e => editarProducto(prod.id, prod.nombre, Number(e.target.value), prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
+    <input defaultValue={prod.descripcion} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, e.target.value, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
+    <input defaultValue={prod.marca} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, e.target.value, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
+    
+      <select
+    value={prod.id_categoria}
+    onChange={e => handleChange(e, prod)}
+  >
+    <option value="" disabled>Selecciona una categoría</option>
+    {categorias.map(cat => (
+      <option key={cat.id_categoria} value={cat.id_categoria}>
+        {cat.nombre}
+      </option>
+    ))}
+  </select>
+
+
+    <input defaultValue={prod.foto} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, e.target.value, prod.stock, prod.genero)} />
+    <input defaultValue={prod.stock} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, Number(e.target.value), prod.genero)} />
+    <input defaultValue={prod.genero} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, e.target.value)} />
+    <button onClick={() => eliminarProducto(prod.id)}>Eliminar</button>
+  </li>
+))}
+
       </ul>
 
       <hr />
@@ -236,6 +326,12 @@ const Admin: React.FC = () => {
           </li>
         ))}
       </ul>
+
+      <h2>Agregar nueva Categoria</h2>
+      <input type="text" placeholder="Nombre..." value={NombreCat} onChange={e => setNombreCat(e.target.value)} />
+      <input type="text" placeholder='Descripción...' value={DescCat} onChange={e => setDescCat(e.target.value)}/>
+      
+      <button onClick={agregarCategoria}>Agregar Categoria</button>
     </div>
 <button
       onClick={() => window.location.href = "/"}
