@@ -29,11 +29,11 @@ interface Categoria {
   nombre: string;
 
 };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface _nuevaCategoria {
-  nombre: string,
-  descripcion: string
-}
+// // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// interface nuevaCategoria {
+//   nombre: string,
+//   descripcion: string
+// }
 
 const Admin: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
