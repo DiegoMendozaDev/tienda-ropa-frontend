@@ -15,7 +15,7 @@ function Carrito() {
     const [productos, setProductos] = useState<Producto[]>([]);
     const [cargando, setCargando] = useState(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [cookies, setCookie, removeCookie] = useCookies(['id_pedido']);
+    const [_cookies, _setCookie, removeCookie] = useCookies(['id_pedido']);
     // Obtengo el id_pedido de la cookie
     function getCookieValue(name: string): string | null {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
