@@ -49,14 +49,14 @@ const categorias: Category[] = [
   },
 ];
 function getCookieValue(name: string): string | null {
-                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                return match ? decodeURIComponent(match[2]) : null;
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
   }
 function NavScroll({ onSearchChange }: NavScrollProps) {
   const navigate = useNavigate();
   // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const [cookies, setCookie, removeCookie] = useCookies(['user','rol', 'id_usuario', 'id_pedido', 'total']);
   const [show, setShow] = useState(false);
   const [selectedCat, setSelectedCat] = useState<Category | null>(null);
   const [searchText, setSearchText] = useState('');
@@ -70,6 +70,10 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
   const handleShow = () => setShow(true);
   const logout = () => {
     removeCookie('user', { path: '/' });
+    removeCookie('rol', { path: '/' });
+    removeCookie('id_usuario', { path: '/' });
+    removeCookie('id_pedido', { path: '/' });
+    removeCookie('total', { path: '/' });
     window.location.reload();
   };
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +83,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
   };
   
    // Esto puede ser string o null
-  let rolCookie = getCookieValue("rol") ?? '[ROLE_USER]'; // si es null, usa '[]'
+  const rolCookie = getCookieValue("rol") ?? '[ROLE_USER]'; // si es null, usa '[]'
   
 
 // Aquí aseguras que 'roldef' sea un array, aunque la cookie sea null o indefinida
@@ -87,10 +91,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
 //   if(rolCookie){
 //      const roles: string[] = JSON.parse(rolCookie);
 //      roldef = roles
-//   }
-  
-  
- 
+
   return (
   
       
@@ -127,7 +128,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
           <div className="d-flex align-items-center gap-4">
             {isLoggedIn ? (
               <div className="d-flex align-items-center gap-2">
-                <Nav.Link href="/profile"><Person size={26} /></Nav.Link>
+                <Nav.Link href="/usuario"><Person size={26} /></Nav.Link>
                 <Nav.Link href="/carrito"><Bag size={26} /></Nav.Link>
                 <Nav.Link href="/favorites"><Heart size={26} /></Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>

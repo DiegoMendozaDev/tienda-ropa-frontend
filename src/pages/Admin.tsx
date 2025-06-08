@@ -29,7 +29,7 @@ interface Categoria {
   nombre: string;
   
 };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface nuevaCategoria{
   nombre: string, 
   descripcion: string
@@ -61,8 +61,9 @@ const Admin: React.FC = () => {
   const [DescCat, setDescCat] = useState('')
  
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [newCategoria, setNuevaCategoria] = useState<number>(0);
   
 
