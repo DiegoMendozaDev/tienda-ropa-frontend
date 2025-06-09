@@ -11,7 +11,6 @@ const PayPalButton: React.FC = () => {
   const handleSuccess = (details: any) => {
     console.log("Pago completado:", details);
     alert(`Gracias por tu compra, ${details.payer.name.given_name}`);
-    // Aquí puedes enviar detalles al backend o redirigir al usuario
   };
 
   useEffect(() => {

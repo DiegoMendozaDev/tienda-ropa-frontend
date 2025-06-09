@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { Bag, Heart, List, Person, X, ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
+import { Bag, List, Person, X, ChevronRight, ChevronLeft } from 'react-bootstrap-icons';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,35 +19,7 @@ interface Category {
 interface NavScrollProps {
   onSearchChange: (value: string) => void;
 }
-// Datos de ejemplo
-const categorias: Category[] = [
-  { 
-    id: '100', 
-    nombre: 'Chico',
-    slug: "chico",
-  },
-  { 
-    id: '200', 
-    nombre: 'Chica', 
-    slug: 'chica'
-  },
-  { 
-    id: '1', 
-    nombre: 'bolso', 
-  },
-  { 
-    id: '2', 
-    nombre: 'camisa', 
-  },
-  { 
-    id: '3', 
-    nombre: 'vestido', 
-  },
-  { 
-    id: '4', 
-    nombre: 'pantalón', 
-  },
-];
+
 function getCookieValue(name: string): string | null {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
@@ -59,8 +31,29 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
   const [cookies, setCookie, removeCookie] = useCookies(['user','rol', 'id_usuario', 'id_pedido', 'total']);
   const [show, setShow] = useState(false);
   const [selectedCat, setSelectedCat] = useState<Category | null>(null);
+  const [categorias, setCategorias] = useState<Category[]>([]);
   const [searchText, setSearchText] = useState('');
-
+  const extraCategorias: Category[] = [
+    { id: '100', nombre: 'Chico', slug: 'chico' },
+    { id: '200', nombre: 'Chica', slug: 'chica' },
+  ];
+  useEffect(() => {
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver')
+      .then(res => res.json())
+      .then((data: Array<{ id_categoria: number; nombre: string; descripcion: string }>) => {
+        const apiCats = data.map(c => ({
+          id: String(c.id_categoria),
+          nombre: c.nombre,
+          descripcion: c.descripcion,
+        }));
+        // Prepend extraCategorias delante de apiCats:
+        setCategorias([
+          ...extraCategorias,
+          ...apiCats
+        ]);
+      })
+      .catch(console.error);
+  }, []);
   const isLoggedIn = Boolean(cookies.user);
 
   const handleClose = () => {
@@ -82,8 +75,8 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
     onSearchChange(value);
   };
   
-   // Esto puede ser string o null
-  const rolCookie = getCookieValue("rol") ?? '[ROLE_USER]'; // si es null, usa '[]'
+  // Esto puede ser string o null
+  const rolCookie = getCookieValue("rol") ?? '[ROLE_USER]'; // si es null, usa '[ROLE_USER]'
   
 
 // Aquí aseguras que 'roldef' sea un array, aunque la cookie sea null o indefinida
@@ -103,7 +96,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
             <List size={26} />
           </Button>
 
-          {/* Buscador (solo en sm+) */}
+          {/* Buscador */}
           <div className="d-none d-sm-flex align-items-center gap-3 ms-3">
             <Nav className="w-100" navbarScroll>
               <Form className="d-flex w-100 justify-content-center">
@@ -130,9 +123,7 @@ function NavScroll({ onSearchChange }: NavScrollProps) {
               <div className="d-flex align-items-center gap-2">
                 <Nav.Link href="/usuario"><Person size={26} /></Nav.Link>
                 <Nav.Link href="/carrito"><Bag size={26} /></Nav.Link>
-                <Nav.Link href="/favorites"><Heart size={26} /></Nav.Link>
                 <Button variant="outline-danger" onClick={logout}>Logout</Button>
-                
                 {rolCookie.includes("admin") && (
   <Button variant="outline-warning" href="/admin">Admin Panel</Button>
 )}

@@ -170,7 +170,13 @@ function FormLogin() {
                       >
                         Volver
                       </Button>
-
+                      <Button
+                        variant="outline-secondary"
+                        href="/register"
+                        className="p-2"
+                      >
+                        Registrarse
+                      </Button>
                     </Col>
                   </Row>
                 )}

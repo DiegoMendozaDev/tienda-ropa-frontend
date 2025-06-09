@@ -14,7 +14,6 @@ function Carrusel() {
   const [slides, setSlides] = useState<Slide[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    // Llama a la API; aquí ejemplo con sin parámetros
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     getFormData<{}, Slide[]>("https://tienda-ropa-backend-xku2.onrender.com/api/productos/masVendidos", {})
       .then((data) => setSlides(data))
@@ -33,7 +32,7 @@ function Carrusel() {
       </div>
     );
   }
-    // Petición OK pero array vacío
+   // Petición OK pero array vacío
   if (slides.length === 0) {
     return <div>No hay slides disponibles.</div>;
   }

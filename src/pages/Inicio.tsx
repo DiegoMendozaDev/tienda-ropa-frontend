@@ -22,7 +22,7 @@ function Inicio() {
         }
 
         try {
-            // 1) Crear o recuperar el pedido
+            // Crear o recuperar el pedido
             const resPedido = await fetch(
                 "https://tienda-ropa-backend-xku2.onrender.com/api/pedido/create",
                 {
@@ -39,7 +39,7 @@ function Inicio() {
             // Guardar el id_pedido en cookie
             document.cookie = `id_pedido=${id_pedido}; path=/; max-age=3600`;
 
-            // 2) Añadir el detalle al pedido
+            // Añadir el detalle al pedido
             const resDetalle = await fetch(
                 "https://tienda-ropa-backend-xku2.onrender.com/api/detalle/create",
                 {
