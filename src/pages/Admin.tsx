@@ -24,20 +24,17 @@ interface Usuario {
   terms: boolean
 }
 
-interface Categoria {
-  id_categoria: number;
-  nombre: string;
 
-};
-// // eslint-disable-next-line @typescript-eslint/no-unused-vars
-// interface nuevaCategoria {
-//   nombre: string,
-//   descripcion: string
-// }
+interface Categoria {
+  id_categoria: number
+  nombre: string,
+  descripcion: string
+}
 
 const Admin: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [categoria, setCategoria] = useState<Categoria[]>([]);
 
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoPrecio, setNuevoPrecio] = useState<number>(0);
@@ -60,23 +57,44 @@ const Admin: React.FC = () => {
   const [NombreCat, setNombreCat] = useState('')
   const [DescCat, setDescCat] = useState('')
 
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_newCategoria, setNuevaCategoria] = useState<number>(0);
+
+  const [categorias, setCategorias] = useState<{ [key: number]: string }>({});
 
 
 
   useEffect(() => {
+    const cargarCategorias = async () => {
+      const nuevasCategorias: { [key: number]: string } = {};
+      const idsUnicos = [...new Set(categoria.map(p => p.id_categoria))];
+      console.log(idsUnicos)
+      await Promise.all(idsUnicos.map(async id => {
+        const nombre = await fetchCat(id);
+        console.log("Nombre: " + nombre)
+        nuevasCategorias[id] = nombre;
+      }));
+      console.log(nuevasCategorias)
+      setCategorias(nuevasCategorias);
+    };
+
+    cargarCategorias();
+  }, [productos]);
+
+  useEffect(() => {
     fetchProductos();
     fetchUsuarios();
+    fetchCategoria()
 
   }, []);
 
 
 
 
+  const fetchCategoria = () => {
+    fetch('https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver')
+      .then(res => res.json())
+      .then(data => setCategoria(data))
+      .catch(err => console.error('Error al cargar productos:', err));
+  } 
   const fetchProductos = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/ver')
       .then(res => res.json())
@@ -90,12 +108,28 @@ const Admin: React.FC = () => {
       .then(data => setUsuarios(data))
       .catch(err => console.error('Error al cargar usuarios:', err));
   };
-  const fetchCat = (id: number) => {
-    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver_categoria/${id}`)
-      .then(res => res.json())
-      .then(data => setCategorias(data))
-      .catch(err => console.error('Error al cargar usuarios:', err));
+  const fetchCat = async (id: number): Promise<string> => {
+    const res = await fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver_categoria/${id}`);
+    const data = await res.json();
+
+    const primeraCategoria = data[0]; // 👈 accede a la primera posición
+    if (!primeraCategoria || !primeraCategoria.nombre) {
+      console.error("Categoría no válida", data);
+      return 'Categoría desconocida';
+    }
+
+    return primeraCategoria.nombre; // ✅ devuelve el string correcto
   };
+
+
+
+
+  // const fetchCat = (id: number) => {
+  //   fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver_categoria/${id}`)
+  //     .then(res => res.json())
+  //     .then(data => console.log(data))
+  //     .catch(err => console.error('Error al cargar usuarios:', err));
+  // };
 
   const agregarProducto = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/create', {
@@ -141,17 +175,17 @@ const Admin: React.FC = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nombre: nuevoNombre,
-        descripcion: nuevadescripcion,
+        nombre: NombreCat,
+        descripcion: DescCat,
 
       }),
     }).then(() => {
       console.log({
-        nombre: nuevoNombre,
-        descripcion: nuevadescripcion,
+        nombre: NombreCat,
+        descripcion: DescCat,
       })
-      setNuevoNombre('');
-      setNuevaDesc('');
+      setNombreCat('');
+      setDescCat('');
     }).catch(err => console.error(err));
   };
 
@@ -222,24 +256,22 @@ const Admin: React.FC = () => {
     }).then(() => fetchUsuarios());
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>, prod: Producto) => {
-    const nuevoIdCat = Number(e.target.value);
-    setCategoriaSeleccionada(nuevoIdCat);
-
-    editarProducto(
-      prod.id,
-      prod.nombre,
-      prod.precio,
-      prod.descripcion,
-      prod.marca,
-      nuevoIdCat,
-      prod.foto,
-      prod.stock,
-      prod.genero
-    );
-
-    fetchCat(nuevoIdCat);
+    const eliminarCategoria = (id: number) => {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/delete/${id}`, {
+      method: 'DELETE',
+    }).then(() => fetchCategoria());
   };
+
+  const editarCategoria = (id: number, nombre: string, descripcion: string) => {
+    fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/update/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({nombre, descripcion}),
+    }).then(() => fetchCategoria());
+  };
+  
+
+ 
   return (
     <>
       <div style={{ padding: '2rem' }}>
@@ -255,15 +287,19 @@ const Admin: React.FC = () => {
         <br></br>
         <select
           value={nuevaCategoria}
-          onChange={e => setNuevaCategoria(Number(e.target.value))}
+          onChange={e => setNuevaCat(Number(e.target.value))} // aquí dejamos string, sin convertir a Number aún
+          required
         >
-          <option value="" disabled>Selecciona una categoría</option>
-          {categorias.map(cat => (
-            <option key={cat.id_categoria} value={cat.id_categoria}>
-              {cat.nombre}
+          <option value="" disabled>
+            Selecciona una categoría
+          </option>
+          {Object.entries(categorias).map(([id, nombre]) => (
+            <option key={id} value={id}>
+              {nombre}
             </option>
           ))}
         </select>
+
         Foto: <input type="file" placeholder="Foto..." value={nuevaFoto} onChange={e => setNuevaFoto(e.target.value)} />
         <br></br>
         stock: <input type="number" placeholder="Stock..." value={nuevoStock} onChange={e => setNuevoStock(Number(e.target.value))} />
@@ -271,27 +307,31 @@ const Admin: React.FC = () => {
         <button onClick={agregarProducto}>Agregar</button>
 
         <h2>Lista de productos</h2>
-        <ul>
+        <ul style={{ listStyleType: 'none' }}>
           {productos.map(prod => (
             <li key={prod.id}>
               <input defaultValue={prod.nombre} onBlur={e => editarProducto(prod.id, e.target.value, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <input defaultValue={prod.precio} onBlur={e => editarProducto(prod.id, prod.nombre, Number(e.target.value), prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <input defaultValue={prod.descripcion} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, e.target.value, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <input defaultValue={prod.marca} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, e.target.value, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-
               <select
                 value={prod.id_categoria}
-                onChange={e => handleChange(e, prod)}
+                onChange={e =>
+                  editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, Number(e.target.value), prod.foto, prod.stock, prod.genero
+                  )
+                }
               >
-                <option value="" disabled>Selecciona una categoría</option>
-                {categorias.map(cat => (
-                  <option key={cat.id_categoria} value={cat.id_categoria}>
-                    {cat.nombre}
-                  </option>
-                ))}
+                <option value={prod.id_categoria}>
+                  {categorias[prod.id_categoria] || 'Cargando...'}
+                </option>
+                {Object.entries(categorias)
+                  .filter(([id]) => Number(id) !== prod.id_categoria)
+                  .map(([id, nombre]) => (
+                    <option key={id} value={id}>
+                      {nombre}
+                    </option>
+                  ))}
               </select>
-
-
               <input defaultValue={prod.foto} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, e.target.value, prod.stock, prod.genero)} />
               <input defaultValue={prod.stock} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, Number(e.target.value), prod.genero)} />
               <input defaultValue={prod.genero} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, e.target.value)} />
@@ -313,11 +353,11 @@ const Admin: React.FC = () => {
         <input type="text" placeholder="Rol..." value={rolUsuario} onChange={e => setRolUsuario(e.target.value)} />
         <input type="text" placeholder="Dirección..." value={direccion} onChange={e => setDir(e.target.value)} />
         <input type="text" placeholder="Codigo Postal..." value={codigo_postal} onChange={e => setCp(e.target.value)} />
-        <input type="checkbox" placeholder="Terms..." checked={Terms} onChange={e => setTerms(Boolean(e.target.value))} />
+        Aceptar los términos: <input type="checkbox" placeholder="Terms..." checked={Terms} onChange={e => setTerms(Boolean(e.target.value))} />
         <button onClick={agregarUsuario}>Agregar Usuario</button>
 
         <h2>Lista de usuarios</h2>
-        <ul>
+        <ul style={{ listStyleType: 'none' }}>
           {usuarios.map(user => (
             <li key={user.id}>
               <input defaultValue={user.nombre} onBlur={e => editarUsuario(user.id, e.target.value, user.email, user.direccion, user.codigo_postal)} />
@@ -328,7 +368,17 @@ const Admin: React.FC = () => {
             </li>
           ))}
         </ul>
-
+          <h1>Administrador de categorias</h1>
+          <h2>Lista de usuarios</h2>
+        <ul style={{ listStyleType: 'none' }}>
+          {categoria.map(cat => (
+            <li key={cat.id_categoria}>
+              <input defaultValue={cat.nombre} onBlur={e => editarCategoria(cat.id_categoria, e.target.value, cat.descripcion)} />
+              <input defaultValue={cat.descripcion} onBlur={e => editarCategoria(cat.id_categoria, cat.nombre, e.target.value)} />
+              <button onClick={() => eliminarCategoria(cat.id_categoria)}>Eliminar</button>
+            </li>
+          ))}
+        </ul>
         <h2>Agregar nueva Categoria</h2>
         <input type="text" placeholder="Nombre..." value={NombreCat} onChange={e => setNombreCat(e.target.value)} />
         <input type="text" placeholder='Descripción...' value={DescCat} onChange={e => setDescCat(e.target.value)} />

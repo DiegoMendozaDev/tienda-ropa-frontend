@@ -48,7 +48,25 @@ const PayPalButton: React.FC = () => {
     document.body.appendChild(script);
   }, []);
 
-  return <div ref={paypalRef}></div>;
+  return (
+    <>
+      <div ref={paypalRef}> </div>
+      <button
+        onClick={() => window.location.href = "/carrito"}
+        style={{
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          padding: "8px 16px",
+          borderRadius: "6px",
+          cursor: "pointer"
+        }}
+      >
+        ← Volver atrás
+      </button>
+    </>
+    
+  );
 };
 
 export default PayPalButton;
