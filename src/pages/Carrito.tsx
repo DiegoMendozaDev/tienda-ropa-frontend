@@ -102,7 +102,6 @@ function Carrito() {
                     res.statusText
                 );
             }
-            // Si deseas procesar la respuesta, haz `await res.json()` aquí
         } catch (error) {
             console.error('Error en fetch PUT:', error);
         }
@@ -115,7 +114,6 @@ function Carrito() {
             )
         );
     };
-
     // Envía DELETE a la API y, si funciona, lo quita del estado
     const eliminarProducto = async (idDetalle: number) => {
         try {

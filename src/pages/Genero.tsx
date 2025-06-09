@@ -24,7 +24,7 @@ function Genero() {
         }
 
         try {
-            // 1) Crear o recuperar el pedido
+            // Crear o recuperar el pedido
             const resPedido = await fetch(
                 "https://tienda-ropa-backend-xku2.onrender.com/api/pedido/create",
                 {

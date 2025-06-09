@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
+  
 interface Producto {
   id: number,
   nombre: string,
@@ -36,6 +37,23 @@ interface Categoria {
 // }
 
 const Admin: React.FC = () => {
+  const navigate = useNavigate();
+
+  // Helper para leer cookies
+  function getCookieValue(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  // Chequeo de rol
+  useEffect(() => {
+    const rolesCookie = getCookieValue('rol') || 'user';
+    if (!rolesCookie.includes('admin')) {
+      // no es admin: lo redirijo al home
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   const [productos, setProductos] = useState<Producto[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
