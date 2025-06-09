@@ -40,7 +40,7 @@ const Admin: React.FC = () => {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
   }
-
+  let id = Number(getCookieValue("id_usuario"));
   // Chequeo de rol
   useEffect(() => {
     const rolesCookie = getCookieValue('rol') || 'user';
@@ -301,7 +301,7 @@ const Admin: React.FC = () => {
         <input type="text" placeholder="Nombre..." value={nuevoNombre} onChange={e => setNuevoNombre(e.target.value)} />
         <input type="text" placeholder="Descripción..." value={nuevadescripcion} onChange={e => setNuevaDesc(e.target.value)} />
         <br></br>
-        Precio: <input type="number" placeholder="Precio..." value={nuevoPrecio} onChange={e => setNuevoPrecio(Number(e.target.value))} />
+        Precio: <input min="0" type="number" placeholder="Precio..." value={nuevoPrecio} onChange={e => setNuevoPrecio(Number(e.target.value))} />
         <input type="text" placeholder="Marca..." value={nuevaMarca} onChange={e => setNuevaMarca(e.target.value)} />
         <br></br>
         <select
@@ -329,7 +329,7 @@ const Admin: React.FC = () => {
           />
 
         <br></br>
-        stock: <input type="number" placeholder="Stock..." value={nuevoStock} onChange={e => setNuevoStock(Number(e.target.value))} />
+        stock: <input min="0" type="number" placeholder="Stock..." value={nuevoStock} onChange={e => setNuevoStock(Number(e.target.value))} />
         <input type="text" placeholder="Género..." value={genero} onChange={e => setGenero(e.target.value)} />
         <button onClick={agregarProducto}>Agregar</button>
 
@@ -338,7 +338,7 @@ const Admin: React.FC = () => {
           {productos.map(prod => (
             <li key={prod.id}>
               <input defaultValue={prod.nombre} onBlur={e => editarProducto(prod.id, e.target.value, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
-              <input defaultValue={prod.precio} onBlur={e => editarProducto(prod.id, prod.nombre, Number(e.target.value), prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
+              <input min="0" defaultValue={prod.precio} onBlur={e => editarProducto(prod.id, prod.nombre, Number(e.target.value), prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <input defaultValue={prod.descripcion} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, e.target.value, prod.marca, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <input defaultValue={prod.marca} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, e.target.value, prod.id_categoria, prod.foto, prod.stock, prod.genero)} />
               <select
@@ -360,7 +360,7 @@ const Admin: React.FC = () => {
                   ))}
               </select>
               <input defaultValue={prod.foto} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, e.target.value, prod.stock, prod.genero)} />
-              <input defaultValue={prod.stock} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, Number(e.target.value), prod.genero)} />
+              <input min="0" defaultValue={prod.stock} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, Number(e.target.value), prod.genero)} />
               <input defaultValue={prod.genero} onBlur={e => editarProducto(prod.id, prod.nombre, prod.precio, prod.descripcion, prod.marca, prod.id_categoria, prod.foto, prod.stock, e.target.value)} />
               <button onClick={() => eliminarProducto(prod.id)}>Eliminar</button>
             </li>
@@ -385,7 +385,7 @@ const Admin: React.FC = () => {
 
         <h2>Lista de usuarios</h2>
         <ul style={{ listStyleType: 'none' }}>
-          {usuarios.map(user => (
+          {usuarios.filter(user => user.id != id).map(user => (
             <li key={user.id}>
               <input defaultValue={user.nombre} onBlur={e => editarUsuario(user.id, e.target.value, user.email, user.direccion, user.codigo_postal)} />
               <input defaultValue={user.email} onBlur={e => editarUsuario(user.id, user.nombre, e.target.value, user.direccion, user.codigo_postal)} />
