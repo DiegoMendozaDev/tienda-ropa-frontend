@@ -54,35 +54,58 @@ function FormRegister() {
   const [isLoading, setIsLoading] = useState(false);
   // @ts-expect-error: esta variable se declara para un futuro uso
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const [cookies, setCookie, removeCookie] = useCookies([  'user','id_usuario','rol']);
 
   const handleSubmit = async (
-    values: FormValues,
-    { setSubmitting }: FormikHelpers<FormValues>
+  values: FormValues,
+  { setSubmitting }: FormikHelpers<FormValues>
   ) => {
     setError(null);
     setIsLoading(true);
+
     try {
-      const result = await postFormData<FormValues, ApiResponse>(
+      // 1) Crear usuario
+      await postFormData<FormValues, ApiResponse>(
         'https://tienda-ropa-backend-xku2.onrender.com/api/usuario/crear',
         values
       );
-      setResponseData(result);
+      // guardar email en cookie
       setCookie('user', values.email, { path: '/', maxAge: 3600 });
-      navigate('/')
+
+      // 2) Obtener id_usuario y rol
+      const res2 = await fetch(
+        'https://tienda-ropa-backend-xku2.onrender.com/api/usuario/ver_usuario',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: values.email })
+        }
+      );
+      if (!res2.ok) throw new Error('No se pudo obtener id_usuario');
+      const info = await res2.json();
+      setCookie('id_usuario', info.id, { path: '/', maxAge: 3600 });
+      setCookie('rol', info.rol, { path: '/', maxAge: 3600 });
+
+      // 3) Finalmente, redirigir a home
+      navigate('/');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err instanceof TypeError) {
-        setError('No se pudo conectar con el servidor. Revisa tu conexión o la configuración del CORS.');
+        setError('No se pudo conectar con el servidor…');
       } else {
-        const errorObj = JSON.parse(err.message);
-        setError(errorObj.error || 'Error desconocido');
+        try {
+          const parsed = JSON.parse(err.message);
+          setError(parsed.error || 'Error desconocido');
+        } catch {
+          setError(err.message);
+        }
       }
     } finally {
       setIsLoading(false);
       setSubmitting(false);
     }
   };
+
   return (
     <Container className="py-4">
       <div className="row justify-content-center">

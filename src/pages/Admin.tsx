@@ -58,7 +58,7 @@ const Admin: React.FC = () => {
   const [nuevadescripcion, setNuevaDesc] = useState('');
   const [nuevaMarca, setNuevaMarca] = useState('');
   const [nuevaCategoria, setNuevaCat] = useState<number>(0);
-  const [nuevaFoto, setNuevaFoto] = useState<File | null>(null);
+  const [nuevaFoto, setNuevaFoto] = useState('');
   const [nuevoStock, setNuevoStock] = useState<number>(0);
   const [genero, setGenero] = useState('');
 
@@ -103,9 +103,6 @@ const Admin: React.FC = () => {
     fetchCategoria()
   }, []);
 
-
-
-
   const fetchCategoria = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver')
       .then(res => res.json())
@@ -148,25 +145,23 @@ const Admin: React.FC = () => {
   //     .catch(err => console.error('Error al cargar usuarios:', err));
   // };
 
-  const agregarProducto = () => {
-    if (!nuevaFoto) {
-      alert("Selecciona una imagen antes de enviar.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("nombre", nuevoNombre);
-    formData.append("descripcion", nuevadescripcion);
-    formData.append("precio", String(nuevoPrecio));
-    formData.append("marca", nuevaMarca);
-    formData.append("id_categoria", String(nuevaCategoria));
-    formData.append("stock", String(nuevoStock));
-    formData.append("genero", genero);
-    // Añadimos el fichero de imagen:
-    formData.append("foto", nuevaFoto);
-    formData.append("unidades_vendidas", '0');
+const agregarProducto = () => {
     fetch('https://tienda-ropa-backend-xku2.onrender.com/api/productos/create', {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: nuevoNombre,
+        descripcion: nuevadescripcion,
+        precio: nuevoPrecio,
+        marca: nuevaMarca,
+        id_categoria: nuevaCategoria,
+        foto: nuevaFoto,
+        stock: nuevoStock,
+        unidades_vendidas: 0,
+        genero: genero
+
+
+      }),
     }).then(() => {
       console.log({
         nombre: nuevoNombre,
@@ -182,7 +177,7 @@ const Admin: React.FC = () => {
       setNuevaDesc('');
       setNuevaMarca('');
       setNuevaCat(0);
-      setNuevaFoto(null);
+      setNuevaFoto('');
       setNuevoStock(0);
       setGenero('');
       fetchProductos();
@@ -322,11 +317,7 @@ const Admin: React.FC = () => {
 
         {/* Foto: <input type="file" placeholder="Foto..." value={nuevaFoto} onChange={e => setNuevaFoto(e.target.value)} /> */}
 
-        Foto: <input type="file" accept="image/*" placeholder="Foto..." onChange={e => {
-          if (e.target.files && e.target.files.length > 0) {
-            setNuevaFoto(e.target.files[0]);
-          }}} 
-          />
+Foto: <input type="text" placeholder="Foto..." value={nuevaFoto} onChange={e => setNuevaFoto(e.target.value)} />
 
         <br></br>
         stock: <input type="number" placeholder="Stock..." value={nuevoStock} onChange={e => setNuevoStock(Number(e.target.value))} />

@@ -209,7 +209,6 @@ function Carrito() {
                         </ul>
                         <div className="mt-6 text-right">
                             <h3 className="text-2xl font-bold">Total: €{total.toFixed(2)}</h3>
-                            {document.cookie = `total=${encodeURIComponent(total.toFixed(2))}; path=/; max-age=3600}`}
                         </div>
                         <div>
                             <Link to="/pagar">
