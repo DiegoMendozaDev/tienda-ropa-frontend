@@ -9,6 +9,7 @@ type Producto = {
     precio: number;
     cantidad: number;
     foto: string;
+    stock: number;
 };
 
 function Carrito() {
@@ -62,8 +63,23 @@ function Carrito() {
                     nombre: detalle.nombre,
                     precio: detalle.precio ?? 0,
                     cantidad: detalle.cantidad ?? 1,
-                    foto: detalle.foto
-                }))
+                    foto: detalle.foto,
+                    stock: 0
+                }));
+                // Ahora llenamos el stock real para cada producto
+                await Promise.all(
+                    productosProcesados.map(async (p, idx) => {
+                        const resp = await fetch(
+                            `https://tienda-ropa-backend-xku2.onrender.com/api/productos/verId/${p.id_producto}`
+                        );
+                        if (resp.ok) {
+                            const json = await resp.json();
+                            productosProcesados[idx].stock = json.stock;
+                        } else {
+                            console.warn(`No se pudo obtener stock de producto ${p.id_producto}`);
+                        }
+                    })
+                );
                 console.log("Productos procesados:", productosProcesados);
                 setProductos(productosProcesados);
             } catch (error) {
@@ -109,10 +125,16 @@ function Carrito() {
 
     const actualizarCantidad = (id: number, nuevaCantidad: number) => {
         setProductos(prev =>
-            prev.map(p =>
-                p.id === id ? { ...p, cantidad: nuevaCantidad } : p
-            )
-        );
+            prev.map(p => {
+                if (p.id !== id) return p;
+                // Comprobamos stock
+                if (nuevaCantidad > p.stock) {
+                    alert(`Sólo hay ${p.stock} unidades en stock`);
+                    return p; // sin cambios
+                }
+                // Si está dentro de stock, actualizamos
+                return { ...p, cantidad: nuevaCantidad };
+            }))
     };
     // Envía DELETE a la API y, si funciona, lo quita del estado
     const eliminarProducto = async (idDetalle: number) => {
@@ -184,13 +206,14 @@ function Carrito() {
                                                     onChange={e => {
                                                         const nuevaCant = Math.max(1, parseInt(e.target.value) || 1);
                                                         actualizarCantidad(producto.id, nuevaCant)
-
-                                                        actualizarDetalleEnServidor(
-                                                            producto.id,
-                                                            producto.id_producto,
-                                                            nuevaCant,
-                                                            producto.precio
-                                                        );
+                                                        if (nuevaCant <= producto.stock) {
+                                                            actualizarDetalleEnServidor(
+                                                                producto.id,
+                                                                producto.id_producto,
+                                                                nuevaCant,
+                                                                producto.precio
+                                                            );
+                                                        }
                                                     }
                                                     }
                                                     className="ml-2 w-16 border rounded px-2 py-1"

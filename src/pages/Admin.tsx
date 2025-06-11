@@ -384,7 +384,7 @@ Foto: <input type="text" placeholder="Foto..." value={nuevaFoto} onChange={e => 
           ))}
         </ul>
           <h1>Administrador de categorias</h1>
-          <h2>Lista de usuarios</h2>
+          <h2>Lista de Categorías</h2>
         <ul style={{ listStyleType: 'none' }}>
           {categoria.map(cat => (
             <li key={cat.id_categoria}>
