@@ -135,9 +135,6 @@ const Admin: React.FC = () => {
     return primeraCategoria.nombre; // ✅ devuelve el string correcto
   };
 
-
-
-
   // const fetchCat = (id: number) => {
   //   fetch(`https://tienda-ropa-backend-xku2.onrender.com/api/categoria/ver_categoria/${id}`)
   //     .then(res => res.json())
